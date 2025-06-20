@@ -5,6 +5,7 @@ public class CinemachineTouchCamera : MonoBehaviour
 {
     public CinemachineCamera cineCam;
     public Transform cameraFollowTarget;
+   // public Transform PlayerPosition;
     public float panSpeed = 0.5f;
     public float zoomSpeed = 1f;
     public float minZoom = 5f;
@@ -120,8 +121,9 @@ public class CinemachineTouchCamera : MonoBehaviour
         newPosition.x = Mathf.Clamp(newPosition.x, panLimitMin.x, panLimitMax.x);
         newPosition.z = Mathf.Clamp(newPosition.z, panLimitMin.y, panLimitMax.y);
 
-        transform.position = newPosition;
+        cameraFollowTarget.position = newPosition;  
     }
+
 
     void Zoom(float amount)
     {
