@@ -261,7 +261,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60.000004
+  field of view: 48.4
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -601,6 +601,7 @@ GameObject:
   - component: {fileID: 1841065762}
   - component: {fileID: 1841065764}
   - component: {fileID: 1841065765}
+  - component: {fileID: 1841065766}
   m_Layer: 0
   m_Name: Vcam
   m_TagString: Untagged
@@ -632,7 +633,7 @@ MonoBehaviour:
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
-    FieldOfView: 60.000004
+    FieldOfView: 48.4
     OrthographicSize: 5
     NearClipPlane: 0.3
     FarClipPlane: 1000
@@ -698,6 +699,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LookAtOffset: {x: 0, y: 0, z: 0}
+--- !u!114 &1841065766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1841065761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1408d13472ac96c44a0a8ee6b24bab7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cineCam: {fileID: 1841065762}
+  cameraFollowTarget: {fileID: 2034345730}
+  panSpeed: 0.5
+  zoomSpeed: 5
+  minZoom: 5
+  maxZoom: 48.4
+  panLimitMin: {x: -50, y: -50}
+  panLimitMax: {x: 50, y: 50}
 --- !u!1001 &1875179329
 PrefabInstance:
   m_ObjectHideFlags: 0
