@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2da169bd76471949b1cb5ff145bd551, type: 3}
   m_Name: IKSettings
   m_EditorClassIdentifier: 
-  stepDistance: 0.15
+  stepDistance: 0.2
   stepHeight: 0.5
   speed: 5
+  velocitySpeedAdjust: 0.1
   rayVerticalOffset: 1
-  movementMultiplier: 0.3
+  movementMultiplier: 0.25
   restRadius: 0.1
   drawGizmos: 1
   raycastLayer:

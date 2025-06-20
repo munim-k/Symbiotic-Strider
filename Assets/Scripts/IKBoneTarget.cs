@@ -14,7 +14,7 @@ public class IKBoneTarget : MonoBehaviour {
     private Vector3 newPosition;
     //Old position of the leg
     private Vector3 oldPosition;
-    private Vector3 restPosition;
+    private Vector3 bodyPosAtRayHit;
     private Vector3 bodyOldPos;
     private Vector3 bodyVelocity;
     private bool isMoving = false;
@@ -27,7 +27,6 @@ public class IKBoneTarget : MonoBehaviour {
         currentPosition = transform.position;
         newPosition = transform.position;
         oldPosition = transform.position;
-        restPosition = body.transform.position;
         bodyOldPos = body.transform.position;
         if (turntoMove) {
             foreach (var leg in oppositeLegs) {
@@ -63,7 +62,8 @@ public class IKBoneTarget : MonoBehaviour {
             Vector3 footPosition = Vector3.Lerp(oldPosition, newPosition, lerp);
             footPosition.y += ikTargetSettings.stepHeightCurve.Evaluate(lerp) * ikTargetSettings.stepHeight;
             currentPosition = footPosition;
-            lerp += Time.fixedDeltaTime * ikTargetSettings.speed;
+            float bodyVelAdjust = 1f + bodyVelocity.magnitude * ikTargetSettings.velocitySpeedAdjust;
+            lerp += Time.fixedDeltaTime * ikTargetSettings.speed * bodyVelAdjust;
         }
         if (lerp > 1f) {
             isMoving = false;
