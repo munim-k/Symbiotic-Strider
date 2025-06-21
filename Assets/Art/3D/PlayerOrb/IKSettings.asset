@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: IKSettings
   m_EditorClassIdentifier: 
   stepDistance: 0.1
-  stepHeight: 0.5
-  speed: 2
+  stepHeight: 0.25
+  speed: 5
   rayVerticalOffset: 1
-  movementMultiplier: 0.2
+  movementMultiplier: 0.1
   restRadius: 0.1
   torsoTransformMultiplier: 1
   drawGizmos: 1

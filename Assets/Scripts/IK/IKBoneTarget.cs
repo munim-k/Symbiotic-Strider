@@ -14,6 +14,8 @@ public class IKBoneTarget : MonoBehaviour {
     private Vector3 targetPosition;
     //Old position of the leg
     private Vector3 oldPosition;
+    private Vector3 bodyVelocity;
+    private Vector3 maxBodyVelocityPerMove;
     private Vector3 bodyOldPos;
     private bool move = false;
     private bool turntoMove = false;
@@ -33,8 +35,14 @@ public class IKBoneTarget : MonoBehaviour {
         transform.position = currentPosition;
         //Rotate offsetVector around the body position
         offsetVector = body.rotation * originalOffsetVector;
+
         //Calculate current target position
-        Vector3 rayOrigin = body.position + offsetVector;
+        bodyVelocity = (body.position - bodyOldPos) / Time.fixedDeltaTime;
+        bodyVelocity *= ikTargetSettings.movementMultiplier;
+        if (bodyVelocity.magnitude > maxBodyVelocityPerMove.magnitude) {
+            maxBodyVelocityPerMove = bodyVelocity;
+        }
+        Vector3 rayOrigin = body.position + offsetVector + maxBodyVelocityPerMove;
         rayOrigin.y += ikTargetSettings.rayVerticalOffset;
         Ray ray = new Ray(rayOrigin, Vector3.down);
 
@@ -42,10 +50,14 @@ public class IKBoneTarget : MonoBehaviour {
         if (Physics.Raycast(ray, out RaycastHit info, ikTargetSettings.rayVerticalOffset + 3, ikTargetSettings.raycastLayer)) {
             targetPosition = info.point;
         }
-        if (!move && turntoMove) {
+        if ((!move) && turntoMove) {
             if (Vector3.Distance(transform.position, targetPosition) > ikTargetSettings.stepDistance) {
                 lerp = 0f;
                 move = true;
+            }
+            else {
+                //Dont need to move this frame so set turntoMove to false
+                turntoMove = false;
             }
         }
         //Animation of leg
@@ -60,6 +72,7 @@ public class IKBoneTarget : MonoBehaviour {
             }
             if (lerp >= 1f) {
                 move = false;
+                maxBodyVelocityPerMove = Vector3.zero;
                 currentPosition = targetPosition;
                 oldPosition = targetPosition;
                 turntoMove = false;

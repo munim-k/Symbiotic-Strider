@@ -34,7 +34,6 @@ public class IKMaster : MonoBehaviour {
             }
         }
         else {
-
             //Right targets were moving
             foreach (IKBoneTarget target in ikTargetsRight) {
                 result = result || target.GetTurn();
