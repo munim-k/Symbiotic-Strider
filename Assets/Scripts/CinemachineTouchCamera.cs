@@ -15,6 +15,7 @@ public class CinemachineTouchCamera : MonoBehaviour
     public Vector2 panLimitMax = new Vector2(50, 50);
 
     public bool IsCameraInteracting { get; private set; }
+    public Transform player; // assign this in the Inspector
 
     private Vector2 lastPanPosition;
     private int panFingerId;
@@ -118,11 +119,19 @@ public class CinemachineTouchCamera : MonoBehaviour
         Vector3 move = new Vector3(-delta.x * panSpeed * Time.deltaTime, 0f, -delta.y * panSpeed * Time.deltaTime);
         Vector3 newPosition = cameraFollowTarget.position + move;
 
-        newPosition.x = Mathf.Clamp(newPosition.x, panLimitMin.x, panLimitMax.x);
-        newPosition.z = Mathf.Clamp(newPosition.z, panLimitMin.y, panLimitMax.y);
+        // Define pan limits relative to the player's position
+        float minX = player.position.x + panLimitMin.x;
+        float maxX = player.position.x + panLimitMax.x;
+        float minZ = player.position.z + panLimitMin.y;
+        float maxZ = player.position.z + panLimitMax.y;
 
-        cameraFollowTarget.position = newPosition;  
+        // Clamp to player-relative bounds
+        newPosition.x = Mathf.Clamp(newPosition.x, minX, maxX);
+        newPosition.z = Mathf.Clamp(newPosition.z, minZ, maxZ);
+
+        cameraFollowTarget.position = newPosition;
     }
+
 
 
     void Zoom(float amount)

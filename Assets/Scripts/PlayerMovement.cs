@@ -1,4 +1,5 @@
 using System.Collections;
+using MagicPigGames;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -19,6 +20,8 @@ public class PlayerMovement : MonoBehaviour
     private float MaxSpeed = 5f; // Maximum speed of the player
     [SerializeField]
     private float MinSpeed = 1f; // Minimum speed of the player when stamina is low
+    [SerializeField]
+    private ProgressBar staminaBar; // Reference to the stamina bar UI
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -72,6 +75,7 @@ public class PlayerMovement : MonoBehaviour
         {
             Turn_Indicator_Off();
         }
+        staminaBar.SetProgress(currentStamina/ maxStamina);
     }
 
     void HandleInput()
