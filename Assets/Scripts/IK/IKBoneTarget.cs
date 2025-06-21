@@ -4,77 +4,66 @@ public class IKBoneTarget : MonoBehaviour {
     [SerializeField] private IKBoneTarget[] oppositeLegs;
     [SerializeField] private Transform body;
     [SerializeField] private IKTargetSettingsSO ikTargetSettings;
-    private float lerp = 0f;
+    private float lerp = 1f;
     //Current position of the leg
     private Vector3 currentPosition;
     //Offset vector from the body to the leg
     [SerializeField] private Vector3 offsetVector;
     private Vector3 originalOffsetVector;
     //New position of the leg
-    private Vector3 newPosition;
+    private Vector3 targetPosition;
     //Old position of the leg
     private Vector3 oldPosition;
-    private float stepAdjustment;
     private Vector3 bodyOldPos;
-    private Vector3 bodyVelocity;
-    private bool isMoving = false;
-    private bool turntoMove = true;
+    private bool move = false;
+    private bool turntoMove = false;
 
     private void Start() {
         offsetVector += transform.position - body.position;
         originalOffsetVector = offsetVector;
         originalOffsetVector = offsetVector;
         currentPosition = transform.position;
-        newPosition = transform.position;
+        targetPosition = transform.position;
         oldPosition = transform.position;
         bodyOldPos = body.transform.position;
-        if (turntoMove) {
-            foreach (var leg in oppositeLegs) {
-                leg.turntoMove = false;
-            }
-        }
     }
 
     // Update is called once per frame
     private void FixedUpdate() {
         transform.position = currentPosition;
-        bodyVelocity = (body.position - bodyOldPos) / Time.fixedDeltaTime;
         //Rotate offsetVector around the body position
         offsetVector = body.rotation * originalOffsetVector;
-        if (!isMoving && turntoMove) {
-            bodyVelocity *= ikTargetSettings.movementMultiplier;
-            Vector3 rayOrigin = body.position + offsetVector + bodyVelocity;
-            rayOrigin.y += ikTargetSettings.rayVerticalOffset;
-            Ray ray = new Ray(rayOrigin, Vector3.down);
+        //Calculate current target position
+        Vector3 rayOrigin = body.position + offsetVector;
+        rayOrigin.y += ikTargetSettings.rayVerticalOffset;
+        Ray ray = new Ray(rayOrigin, Vector3.down);
 
-            if (Physics.Raycast(ray, out RaycastHit info, ikTargetSettings.rayVerticalOffset + 3, ikTargetSettings.raycastLayer)) {
-                //If the player has moved a certain distance from the old position, the leg will move to the new position
-                if (Vector3.Distance(newPosition, info.point) > ikTargetSettings.stepDistance) {
-                    newPosition = info.point;
-                    lerp = 0f;
-                    stepAdjustment = Mathf.Abs(oldPosition.magnitude - newPosition.magnitude);
-                }
-
+        //Find target position
+        if (Physics.Raycast(ray, out RaycastHit info, ikTargetSettings.rayVerticalOffset + 3, ikTargetSettings.raycastLayer)) {
+            targetPosition = info.point;
+        }
+        if (!move && turntoMove) {
+            if (Vector3.Distance(transform.position, targetPosition) > ikTargetSettings.stepDistance) {
+                lerp = 0f;
+                move = true;
             }
         }
         //Animation of leg
-        if (lerp < 1f && turntoMove && !AreOppositeLegsMoving()) {
-            isMoving = true;
-            Vector3 footPosition = Vector3.Lerp(oldPosition, newPosition, lerp);
-            //Leg should lift less if step is smaller
-            footPosition.y += ikTargetSettings.stepHeightCurve.Evaluate(lerp) * stepAdjustment * ikTargetSettings.stepHeight;
-            currentPosition = footPosition;
-            float bodyVelAdjust = 1f + bodyVelocity.magnitude * ikTargetSettings.velocitySpeedAdjust;
-            lerp += Time.fixedDeltaTime * ikTargetSettings.speed * bodyVelAdjust;
-        }
-        if (lerp > 1f) {
-            isMoving = false;
-            currentPosition = newPosition;
-            oldPosition = newPosition;
-            foreach (var leg in oppositeLegs) {
-                leg.turntoMove = true;
+        if (move) {
+            if (lerp < 1f && turntoMove) {
+                Vector3 footPosition = Vector3.Lerp(oldPosition, targetPosition, lerp);
+                //Leg should lift less if step is smaller
+                footPosition.y += ikTargetSettings.stepHeightCurve.Evaluate(lerp) * ikTargetSettings.stepHeight;
+                currentPosition = footPosition;
+                //The bigger the distance the faster the leg moves
+                lerp += Time.fixedDeltaTime * ikTargetSettings.speed;
             }
-            turntoMove = false;
+            if (lerp >= 1f) {
+                move = false;
+                currentPosition = targetPosition;
+                oldPosition = targetPosition;
+                turntoMove = false;
+            }
         }
         bodyOldPos = body.position;
     }
@@ -87,17 +76,15 @@ public class IKBoneTarget : MonoBehaviour {
     }
 
 
-    private bool AreOppositeLegsMoving() {
-        foreach (IKBoneTarget leg in oppositeLegs) {
-            if (leg.isMoving) {
-                return true;
-            }
-        }
-        return false;
+    public void SetTurn(bool turn) {
+        turntoMove = turn;
+    }
+    public bool GetTurn() {
+        return turntoMove;
     }
 
     public bool IsGrounded() {
-        return !isMoving;
+        return !move;
     }
 
 
@@ -109,7 +96,7 @@ public class IKBoneTarget : MonoBehaviour {
             Gizmos.color = UnityEngine.Color.red;
             Gizmos.DrawSphere(oldPosition, ikTargetSettings.stepDistance);
             Gizmos.color = UnityEngine.Color.green;
-            Gizmos.DrawSphere(newPosition, ikTargetSettings.stepDistance);
+            Gizmos.DrawSphere(targetPosition, ikTargetSettings.stepDistance);
         }
 
     }
