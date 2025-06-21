@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stepDistance: 0.2
   stepHeight: 0.5
-  speed: 5
-  velocitySpeedAdjust: 0.1
+  speed: 3
+  velocitySpeedAdjust: 0.3
   rayVerticalOffset: 1
   movementMultiplier: 0.25
   restRadius: 0.1

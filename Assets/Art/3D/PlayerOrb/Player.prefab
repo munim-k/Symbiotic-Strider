@@ -1032,6 +1032,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8066341551389775102, guid: d89f044b1c4677a42a31a67f09ea70a9, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 72a424c4c3967db4086862a7c0b57dcc, type: 2}
+    - target: {fileID: -2872079895546425931, guid: d89f044b1c4677a42a31a67f09ea70a9, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 72a424c4c3967db4086862a7c0b57dcc, type: 2}
     - target: {fileID: 919132149155446097, guid: d89f044b1c4677a42a31a67f09ea70a9, type: 3}
       propertyPath: m_Name
       value: Player
@@ -1060,6 +1068,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7036213049465896255, guid: d89f044b1c4677a42a31a67f09ea70a9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2274794455346057520}
+    - targetCorrespondingSourceObject: {fileID: 2595880195381855276, guid: d89f044b1c4677a42a31a67f09ea70a9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1309892566736077401}
   m_SourcePrefab: {fileID: 100100000, guid: d89f044b1c4677a42a31a67f09ea70a9, type: 3}
 --- !u!4 &855325280223654889 stripped
 Transform:
@@ -1284,6 +1295,29 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2377984850503987022, guid: d89f044b1c4677a42a31a67f09ea70a9, type: 3}
   m_PrefabInstance: {fileID: 5958265260201540623}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &8554140983815174179 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2595880195381855276, guid: d89f044b1c4677a42a31a67f09ea70a9, type: 3}
+  m_PrefabInstance: {fileID: 5958265260201540623}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1309892566736077401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8554140983815174179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8671a2cc1ec194349ab1dc0cd7f480e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ikTargets:
+  - {fileID: 1759828566616103597}
+  - {fileID: 1650675542596522836}
+  - {fileID: 1164943822028857130}
+  - {fileID: 2751500542679659300}
+  ikTargetSettings: {fileID: 11400000, guid: fdc677520750d0845b7bce52868621d3, type: 2}
 --- !u!4 &8951392664686228240 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -5869951061532078305, guid: d89f044b1c4677a42a31a67f09ea70a9, type: 3}
