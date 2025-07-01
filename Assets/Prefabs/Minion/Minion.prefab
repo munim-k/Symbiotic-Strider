@@ -223,10 +223,30 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -5452268426013630409, guid: b2ac1378311937b4bac6a19d91d8ad90, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 4c2ed895e9b78894eabb17cd7507b1c7, type: 2}
+    - target: {fileID: -4683669308469848369, guid: b2ac1378311937b4bac6a19d91d8ad90, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 4c2ed895e9b78894eabb17cd7507b1c7, type: 2}
     - target: {fileID: 919132149155446097, guid: b2ac1378311937b4bac6a19d91d8ad90, type: 3}
       propertyPath: m_Name
       value: Minion
       objectReference: {fileID: 0}
+    - target: {fileID: 2389156955700731062, guid: b2ac1378311937b4bac6a19d91d8ad90, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 4c2ed895e9b78894eabb17cd7507b1c7, type: 2}
+    - target: {fileID: 3677871804177914180, guid: b2ac1378311937b4bac6a19d91d8ad90, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 4c2ed895e9b78894eabb17cd7507b1c7, type: 2}
+    - target: {fileID: 7985977198901741351, guid: b2ac1378311937b4bac6a19d91d8ad90, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 4c2ed895e9b78894eabb17cd7507b1c7, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
