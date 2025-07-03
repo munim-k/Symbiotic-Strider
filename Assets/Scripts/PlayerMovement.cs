@@ -1,4 +1,5 @@
 using MagicPigGames;
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -22,6 +23,7 @@ public class PlayerMovement : MonoBehaviour {
     private ProgressBar staminaBar; // Reference to the stamina bar UI
 
     private bool moving = false;
+    public Action<bool> OnMove;
     void Start() {
         agent = GetComponent<NavMeshAgent>();
         currentStamina = maxStamina;
@@ -42,6 +44,9 @@ public class PlayerMovement : MonoBehaviour {
 
         // Stamina logic
         if (agent.hasPath && agent.remainingDistance > agent.stoppingDistance) {
+            if (!moving) {
+                OnMove?.Invoke(true);
+            }
             moving = true;
             currentStamina -= staminaDrainRate * Time.deltaTime;
             currentStamina = Mathf.Max(currentStamina, 0f);
@@ -55,7 +60,12 @@ public class PlayerMovement : MonoBehaviour {
             currentStamina += staminaRegenRate * Time.deltaTime;
             currentStamina = Mathf.Min(currentStamina, maxStamina);
             agent.speed = 5f; // reset to max speed
+            if(moving)
+            {
+                OnMove?.Invoke(false);
+            }
             moving = false;
+
         }
 
         if (touchIndicatorObject != null) {
