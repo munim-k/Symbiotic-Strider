@@ -20,7 +20,7 @@ public class HybridEnemyBehaviour : BaseEnemyBehaviour
                 attackDelayTimer += Time.fixedDeltaTime;
                 if (attackDelayTimer >= attackDelay)
                 {
-                    OnEnemyAttack?.Invoke();
+                    OnEnemyAttack?.Invoke(player.transform.position);
                     attackDelayTimer = 0f; // Reset the attack delay timer
                 }
             }

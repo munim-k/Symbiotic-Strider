@@ -20,7 +20,7 @@ public class BaseEnemyBehaviour : MonoBehaviour
     }
 
     public Action<Vector3> OnEnemyMove;
-    public Action OnEnemyAttack;
+    public Action<Vector3> OnEnemyAttack;
     public Action OnEnemySupport;
 
     private void Start()

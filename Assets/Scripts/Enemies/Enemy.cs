@@ -10,7 +10,19 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float playerRange = 6f;
     [SerializeField] private float meleeAttackRange = 2f;
     [SerializeField] private float attackDelay = 2f;
+    [SerializeField] private EnemyAnimation enemyAnimation;
+
+    public enum EnemyState
+    {
+        Idle,
+        Moving,
+        Attacking,
+        Supporting
+    }
+    public Action<EnemyState> OnEnemyStateChange;
+
     private NavMeshAgent agent;
+    private bool isAttackingOrSupporting = false;
     private BaseEnemyBehaviour baseBehaviour;
 
     private void Awake()
@@ -21,22 +33,7 @@ public class Enemy : MonoBehaviour
             Debug.LogError("NavMeshAgent component is missing on the enemy.");
         }
 
-        //add the appropriate behaviour component based on the behaviour type
-        switch (behaviourType)
-        {
-            case EnemyBehaviourType.BehaviourType.Aggressive:
-                baseBehaviour = gameObject.AddComponent<AggressiveEnemyBehaviour>();
-                break;
-            case EnemyBehaviourType.BehaviourType.Defensive:
-                baseBehaviour = gameObject.AddComponent<DefensiveEnemyBehaviour>();
-                break;
-            case EnemyBehaviourType.BehaviourType.Hybrid:
-                baseBehaviour = gameObject.AddComponent<HybridEnemyBehaviour>();
-                break;
-            default:
-                Debug.LogError("Unknown enemy behaviour type.");
-                break;
-        }
+        baseBehaviour = (BaseEnemyBehaviour)gameObject.AddComponent(EnemyBehaviourType.behaviourClasses[behaviourType]);
         
         if(baseBehaviour != null)
         {
@@ -61,23 +58,45 @@ public class Enemy : MonoBehaviour
         {
             Debug.LogError("BaseEnemyBehaviour component is missing on the enemy.");
         }
+
+        enemyAnimation.OnAnimationComplete += () => { isAttackingOrSupporting = false; };
+    }
+
+    private void Update()
+    {
+        //check if the agent has reached the destination
+        if (agent.remainingDistance <= agent.stoppingDistance && !isAttackingOrSupporting)
+        {
+            OnEnemyStateChange?.Invoke(EnemyState.Idle);
+        }
     }
 
     private void HandleEnemySupport()
     {
-        Debug.Log("Enemy is supporting from a distance.");
+        isAttackingOrSupporting = true;
+        agent.isStopped = true;
+
+        OnEnemyStateChange?.Invoke(EnemyState.Supporting);
     }
 
     private void HandleEnemyMove(Vector3 movementVector)
     {
-        agent.SetDestination(transform.position + movementVector);
-        agent.isStopped = false;
+        if (!isAttackingOrSupporting)
+        {
+            agent.SetDestination(transform.position + movementVector);
+            agent.isStopped = false;
+
+            OnEnemyStateChange?.Invoke(EnemyState.Moving);
+        }
     }
 
-    private void HandleEnemyAttack()
+    private void HandleEnemyAttack(Vector3 playerPos)
     {
+        isAttackingOrSupporting = true;
         agent.isStopped = true;
 
-        Debug.Log("Melee attack executed on player.");
+        transform.LookAt(new Vector3(playerPos.x, transform.position.y, playerPos.z));
+
+        OnEnemyStateChange?.Invoke(EnemyState.Attacking);
     }
 }
