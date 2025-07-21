@@ -15,7 +15,8 @@ public class Enemy : MonoBehaviour
     [SerializeField] private List<GameObject> projectilePrefabs;
     [SerializeField] private float damage = 10f;
     [SerializeField] private float rangeAttackBuildUp = 5f;
-    private Vector3 playerPosition;
+    private Vector3 closestHIttablePosition;
+    private Minion closestMinion;
 
     public enum EnemyState
     {
@@ -26,7 +27,8 @@ public class Enemy : MonoBehaviour
         Supporting
     }
     public Action<EnemyState> OnEnemyStateChange;
-    public static Action<float> OnEnemyAttacked;
+    public static Action<float> OnEnemyAttackedPlayer;
+    public static Action<Minion> OnEnemyAttackedMinion;
 
     private NavMeshAgent agent;
     private bool isAttackingOrSupporting = false;
@@ -70,13 +72,20 @@ public class Enemy : MonoBehaviour
         enemyAnimation.OnMeleeAttackDamage += () =>
         {
             //check if the player is in melee range
-            if (Vector3.Distance(transform.position, playerPosition) <= meleeAttackRange)
+            if (Vector3.Distance(transform.position, closestHIttablePosition) <= meleeAttackRange)
             {
-                OnEnemyAttacked?.Invoke(damage);
+                if (closestMinion != null)
+                {
+                    OnEnemyAttackedMinion?.Invoke(closestMinion);
+                }
+                else
+                {
+                    OnEnemyAttackedPlayer?.Invoke(damage);
+                }
             }
         };
     }
-    private void OnDisable()
+    private void OnDestroy()
     {
         baseBehaviour.OnEnemyMove -= HandleEnemyMove;
         baseBehaviour.OnEnemyAttack -= HandleEnemyAttack;
@@ -110,13 +119,14 @@ public class Enemy : MonoBehaviour
             OnEnemyStateChange?.Invoke(EnemyState.Moving);
         }
 
-        playerPosition = transform.position + movementVector;
+        closestHIttablePosition = transform.position + movementVector;
     }
 
-    private void HandleEnemyAttack(Vector3 playerPos, EnemyBehaviourType.AttackType attackType)
+    private void HandleEnemyAttack(Vector3 playerPos, EnemyBehaviourType.AttackType attackType, Minion closestMinion)
     {
         isAttackingOrSupporting = true;
         agent.isStopped = true;
+        this.closestMinion = closestMinion;
 
         transform.LookAt(new Vector3(playerPos.x, transform.position.y, playerPos.z));
 

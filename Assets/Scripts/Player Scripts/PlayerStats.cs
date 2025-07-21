@@ -67,7 +67,7 @@ public class PlayerStats : MonoBehaviour
         currentStamina = maxStamina;
         currentHealth = maxHealthAfterStamina;
 
-        Enemy.OnEnemyAttacked += damage =>
+        Enemy.OnEnemyAttackedPlayer += damage =>
         {
             currentHealth -= damage;
             currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealthAfterStamina);

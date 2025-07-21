@@ -7,21 +7,21 @@ public class AggressiveEnemyBehaviour : BaseEnemyBehaviour
         // move towrads the player and attack if close enough
         if (player != null)
         {
-            Vector3 directionToPlayer = player.transform.position - transform.position;
-            float distanceToPlayer = directionToPlayer.magnitude;
+            Vector3 directionToClosest = GetClosestAggroObject(out Transform closestMinion);
+            float distanceToClosest = directionToClosest.magnitude;
 
             //move towrads the player and stop at melee range and then attack
-            if (distanceToPlayer > meleeAttackRange)
+            if (distanceToClosest > meleeAttackRange)
             {
-                Vector3 movementVector = directionToPlayer.normalized * Time.fixedDeltaTime * movementSpeed;
+                Vector3 movementVector = directionToClosest.normalized * Time.fixedDeltaTime * movementSpeed;
                 OnEnemyMove?.Invoke(movementVector);
             }
-            else if (distanceToPlayer <= meleeAttackRange)
+            else if (distanceToClosest <= meleeAttackRange)
             {
                 attackDelayTimer += Time.fixedDeltaTime;
                 if (attackDelayTimer >= attackDelay)
                 {
-                    OnEnemyAttack?.Invoke(player.transform.position, EnemyBehaviourType.AttackType.Melee);
+                    OnEnemyAttack?.Invoke(closestMinion ? closestMinion.position : player.transform.position, EnemyBehaviourType.AttackType.Melee, closestMinion ? closestMinion.GetComponent<Minion>() : null);
                     attackDelayTimer = 0f; // Reset the attack delay timer
                 }
             }

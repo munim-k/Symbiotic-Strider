@@ -8,24 +8,24 @@ public class DefensiveEnemyBehaviour : BaseEnemyBehaviour
         //stay at range from the player and do ranged attacks
         if (player != null)
         {
-            Vector3 directionToPlayer = player.transform.position - transform.position;
-            float distanceToPlayer = directionToPlayer.magnitude;
+            Vector3 directionToClosest = GetClosestAggroObject(out Transform closestMinion);
+            float distanceToClosest = directionToClosest.magnitude;
 
             //see if the player is within the player range and if it is then start moving away from the player until get out of range
-            if (distanceToPlayer < playerRange)
+            if (distanceToClosest < playerRange)
             {
-                Vector3 movementVector = -directionToPlayer.normalized * Time.fixedDeltaTime * movementSpeed;
+                Vector3 movementVector = -directionToClosest.normalized * Time.fixedDeltaTime * movementSpeed;
                 OnEnemyMove?.Invoke(movementVector);
             }
-            else if (distanceToPlayer >= playerRange)
+            else if (distanceToClosest >= playerRange)
             {
                 attackDelayTimer += Time.fixedDeltaTime;
                 if (attackDelayTimer >= attackDelay)
                 {
-                    if(Random.value < 1f)
+                    if(Random.value < 0.5f)
                     {
                         // Randomly choose to either attack or support
-                        OnEnemyAttack?.Invoke(player.transform.position, EnemyBehaviourType.AttackType.Ranged);
+                        OnEnemyAttack?.Invoke(player.transform.position, EnemyBehaviourType.AttackType.Ranged, null);
                     }
                     else
                     {

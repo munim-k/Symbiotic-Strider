@@ -31,6 +31,12 @@ public class PlayerMovement : MonoBehaviour {
         PlayerStats.Instance.OnStunProcced += HandleStunProcced;
     }
 
+    private void OnDestroy()
+    {
+        PlayerStats.Instance.OnFrostProcced -= HandleFrostProcced;
+        PlayerStats.Instance.OnStunProcced -= HandleStunProcced;
+    }
+
     private void HandleStunProcced(bool obj)
     {
         if (obj)

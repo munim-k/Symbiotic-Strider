@@ -29,7 +29,7 @@ public class EnemyAnimation : MonoBehaviour
         }
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
         enemy.OnEnemyStateChange -= HandleEnemyStateChange;
     }
