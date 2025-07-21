@@ -6,6 +6,7 @@ public class EnemyAnimation : MonoBehaviour
     [SerializeField] private Enemy enemy;
     private Animator animator;
     public Action OnAnimationComplete;
+    public Action OnMeleeAttackDamage;
 
     private void Awake()
     {
@@ -28,6 +29,11 @@ public class EnemyAnimation : MonoBehaviour
         }
     }
 
+    private void OnDisable()
+    {
+        enemy.OnEnemyStateChange -= HandleEnemyStateChange;
+    }
+
     private void HandleEnemyStateChange(Enemy.EnemyState state)
     {
         switch (state)
@@ -36,21 +42,31 @@ public class EnemyAnimation : MonoBehaviour
                 animator.SetBool("isMoving", false);
                 animator.SetBool("isAttacking", false);
                 animator.SetBool("isSupporting", false);
+                animator.SetBool("isRangeAttacking", false);
                 break;
             case Enemy.EnemyState.Moving:
                 animator.SetBool("isMoving", true);
                 animator.SetBool("isAttacking", false);
                 animator.SetBool("isSupporting", false);
+                animator.SetBool("isRangeAttacking", false);
                 break;
             case Enemy.EnemyState.Attacking:
                 animator.SetBool("isMoving", false);
                 animator.SetBool("isAttacking", true);
                 animator.SetBool("isSupporting", false);
+                animator.SetBool("isRangeAttacking", false);
                 break;
             case Enemy.EnemyState.Supporting:
                 animator.SetBool("isMoving", false);
                 animator.SetBool("isAttacking", false);
                 animator.SetBool("isSupporting", true);
+                animator.SetBool("isRangeAttacking", false);
+                break;
+            case Enemy.EnemyState.RangedAttacking:
+                animator.SetBool("isMoving", false);
+                animator.SetBool("isAttacking", false);
+                animator.SetBool("isSupporting", false);
+                animator.SetBool("isRangeAttacking", true);
                 break;
         }
     }
@@ -60,6 +76,12 @@ public class EnemyAnimation : MonoBehaviour
         animator.SetBool("isMoving", false);
         animator.SetBool("isAttacking", false);
         animator.SetBool("isSupporting", false);
+        animator.SetBool("isRangeAttacking", false);
+    }
+
+    public void MeleeAttackDamage()
+    {
+        OnMeleeAttackDamage?.Invoke();
     }
 
 }

@@ -20,7 +20,7 @@ public class HybridEnemyBehaviour : BaseEnemyBehaviour
                 attackDelayTimer += Time.fixedDeltaTime;
                 if (attackDelayTimer >= attackDelay)
                 {
-                    OnEnemyAttack?.Invoke(player.transform.position);
+                    OnEnemyAttack?.Invoke(player.transform.position, EnemyBehaviourType.AttackType.Melee);
                     attackDelayTimer = 0f; // Reset the attack delay timer
                 }
             }
@@ -51,8 +51,16 @@ public class HybridEnemyBehaviour : BaseEnemyBehaviour
                 attackDelayTimer += Time.fixedDeltaTime;
                 if (attackDelayTimer >= attackDelay)
                 {
-                    // Support from a distance
-                    OnEnemySupport?.Invoke();
+                    if(Random.value < 0.5f)
+                    {
+                        // Randomly choose to either attack or support
+                        OnEnemyAttack?.Invoke(player.transform.position, EnemyBehaviourType.AttackType.Ranged);
+                    }
+                    else
+                    {
+                        // Support from a distance
+                        OnEnemySupport?.Invoke();
+                    }
                     attackDelayTimer = 0f; // Reset the attack delay timer
                 }
             }

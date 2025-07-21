@@ -22,8 +22,16 @@ public class DefensiveEnemyBehaviour : BaseEnemyBehaviour
                 attackDelayTimer += Time.fixedDeltaTime;
                 if (attackDelayTimer >= attackDelay)
                 {
-                    // Attack the player from a distance
-                    OnEnemySupport?.Invoke();
+                    if(Random.value < 1f)
+                    {
+                        // Randomly choose to either attack or support
+                        OnEnemyAttack?.Invoke(player.transform.position, EnemyBehaviourType.AttackType.Ranged);
+                    }
+                    else
+                    {
+                        // Support from a distance
+                        OnEnemySupport?.Invoke();
+                    }
                     attackDelayTimer = 0f; // Reset the attack delay timer
                 }
             }

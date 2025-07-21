@@ -16,4 +16,10 @@ public class EnemyBehaviourType
         Defensive,
         Hybrid
     }
+
+    public enum AttackType
+    {
+        Melee,
+        Ranged
+    }
 }

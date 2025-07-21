@@ -21,7 +21,7 @@ public class AggressiveEnemyBehaviour : BaseEnemyBehaviour
                 attackDelayTimer += Time.fixedDeltaTime;
                 if (attackDelayTimer >= attackDelay)
                 {
-                    OnEnemyAttack?.Invoke(player.transform.position);
+                    OnEnemyAttack?.Invoke(player.transform.position, EnemyBehaviourType.AttackType.Melee);
                     attackDelayTimer = 0f; // Reset the attack delay timer
                 }
             }

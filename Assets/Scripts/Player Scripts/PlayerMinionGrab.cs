@@ -1,7 +1,9 @@
 using UnityEngine;
 
 public class PlayerMinionGrab : MonoBehaviour {
-
+    //Singleton instance
+    public static PlayerMinionGrab Instance { get; private set; }
+    
     [SerializeField] private float minionTapDetectionRadius;
     [SerializeField] private float minionWalkDetectionRadius;
     [SerializeField] private LayerMask groundLayer;
@@ -15,7 +17,16 @@ public class PlayerMinionGrab : MonoBehaviour {
     private int currentIKTarget;
     private Minion currentMinion;
 
-    private enum State {
+    private void Awake() {
+        if (Instance == null) {
+            Instance = this;
+        } else {
+            Destroy(gameObject);
+        }
+    }
+    
+    private enum State
+    {
         Idle,
         Moving,
         Grabbing,
