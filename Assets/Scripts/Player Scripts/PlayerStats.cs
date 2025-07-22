@@ -123,35 +123,46 @@ public class PlayerStats : MonoBehaviour
         UpgradeUI.Instance.OnStunUpgraded += StunUpgrade;
         UpgradeUI.Instance.OnPoisonUpgraded += PoisonUpgrade;
         UpgradeUI.Instance.OnFrostUpgraded += FrostUpgrade;
+        GlyphsUI.Instance.OnMountainButtonClicked += HealthUpgradeBetter;
     }
 
     private void FrostUpgrade()
     {
-        frostProcThreshhold *= 1.2f;
+        frostProcThreshhold *= 1.05f;
         OnPlayerUpgradedSingle?.Invoke(UpgradeType.Frost, frostProcThreshhold / originalFrostProcThreshhold);
     }
 
     private void PoisonUpgrade()
     {
-        poisonProcThreshhold *= 1.2f;
+        poisonProcThreshhold *= 1.05f;
         OnPlayerUpgradedSingle?.Invoke(UpgradeType.Poison, poisonProcThreshhold / originalPoisonProcThreshhold);
     }
 
     private void StunUpgrade()
     {
-        stunProcThreshhold *= 1.2f;
+        stunProcThreshhold *= 1.05f;
         OnPlayerUpgradedSingle?.Invoke(UpgradeType.Stun, stunProcThreshhold / originalStunProcThreshhold);
     }
 
     private void StaminaUpgrade()
     {
-        maxStamina *= 1.2f;
+        maxStamina *= 1.1f;
         OnPlayerUpgradedSingle?.Invoke(UpgradeType.Stamina, maxStamina / originalMaxStamina);
     }
 
     private void HealthUpgrade()
     {
-        maxHealth *= 1.2f;
+        maxHealth *= 1.1f;
+        currentHealth = maxHealth;
+        maxHealthAfterStamina = maxHealth;
+        OnPlayerUpgradedSingle?.Invoke(UpgradeType.Health, maxHealth / originalMaxHealth);
+    }
+
+    private void HealthUpgradeBetter()
+    {
+        maxHealth *= 1.5f;
+        currentHealth = maxHealth;
+        maxHealthAfterStamina = maxHealth;
         OnPlayerUpgradedSingle?.Invoke(UpgradeType.Health, maxHealth / originalMaxHealth);
     }
 
@@ -169,7 +180,9 @@ public class PlayerStats : MonoBehaviour
         UpgradeUI.Instance.OnStunUpgraded -= StunUpgrade;
         UpgradeUI.Instance.OnPoisonUpgraded -= PoisonUpgrade;
         UpgradeUI.Instance.OnFrostUpgraded -= FrostUpgrade;
+        GlyphsUI.Instance.OnFortressButtonClicked -= HealthUpgradeBetter;
     }
+
 
     private void Update()
     {

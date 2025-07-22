@@ -25,17 +25,24 @@ public class MinionHandler : MonoBehaviour
     private void Start()
     {
         UpgradeUI.Instance.OnDamageUpgraded += DamageUpgraded;
+        GlyphsUI.Instance.OnLanceButtonClicked += DamageUpgradedBetter;
     }
 
     private void DamageUpgraded()
     {
         damage *= 1.2f;
     }
+    private void DamageUpgradedBetter()
+    {
+        damage = 17.5f;
+    }
 
     private void OnDestroy()
     {
         UpgradeUI.Instance.OnDamageUpgraded -= DamageUpgraded;
+        GlyphsUI.Instance.OnLanceButtonClicked -= DamageUpgradedBetter;
     }
+
 
     int spawnIndex = 0;
     public void SpawnMinion()
@@ -43,7 +50,8 @@ public class MinionHandler : MonoBehaviour
         Transform newMinionTransform = Instantiate(minion, minionSpawnPoints[spawnIndex].position, Quaternion.identity);
         newMinionTransform.localScale = player.transform.localScale;
         Minion newMinion = newMinionTransform.GetComponent<Minion>();
-        MinionAI minionAI = minion.GetComponent<MinionAI>();
+        MinionAI minionAI = newMinion.GetComponent<MinionAI>();
+        Debug.Log(damage);
         minionAI.damage = damage;
         spawnIndex++;
         spawnIndex %= minionSpawnPoints.Length;

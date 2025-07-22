@@ -94,7 +94,6 @@ public class MinionAI : MonoBehaviour
     private void HandleMinionGrabbedOrAttacked()
     {
         isGrabbed = true;
-        Debug.Log("Idle Now");
         SetState(MinionState.Idle);
         if (enemies != null)
         {

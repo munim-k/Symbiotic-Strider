@@ -5,7 +5,6 @@ using UnityEngine.AI;
 public class PlayerMovement : MonoBehaviour {
     public static PlayerMovement Instance { get; private set; }
     private NavMeshAgent agent;
-    private bool isTouching = false;
     [SerializeField] private GameObject touchIndicatorObject;
 
     private float originalMaxSpeed = 5f;
@@ -39,6 +38,13 @@ public class PlayerMovement : MonoBehaviour {
         PlayerStats.Instance.OnPlayerUpgraded += HandlePlayerUpgrade;
 
         UpgradeUI.Instance.OnMoveSpeedUpgraded += MoveSpeedUpgraded;
+        GlyphsUI.Instance.OnCometButtonClicked += MoveSpeedUpgradedBetter;
+    }
+
+    private void MoveSpeedUpgradedBetter()
+    {
+        minSpeed *= 2f;
+        maxSpeed *= 2f;
     }
 
     private void MoveSpeedUpgraded()
@@ -52,6 +58,9 @@ public class PlayerMovement : MonoBehaviour {
         PlayerStats.Instance.OnFrostProcced -= HandleFrostProcced;
         PlayerStats.Instance.OnStunProcced -= HandleStunProcced;
         PlayerStats.Instance.OnPlayerUpgraded -= HandlePlayerUpgrade;
+
+        UpgradeUI.Instance.OnMoveSpeedUpgraded -= MoveSpeedUpgraded;
+        GlyphsUI.Instance.OnCometButtonClicked += MoveSpeedUpgradedBetter;
     }
 
     private void HandlePlayerUpgrade(float scale)
