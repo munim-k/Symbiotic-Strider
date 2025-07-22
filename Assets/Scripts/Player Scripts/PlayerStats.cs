@@ -19,6 +19,15 @@ public class PlayerStats : MonoBehaviour
     public Action<bool> OnFrostProcced;
     public Action<bool> OnStunProcced;
 
+    [Header("Player Shader Settings")]
+    [SerializeField] private Material playerMaterial;
+    [SerializeField] private Color frostColor = Color.cyan;
+    [SerializeField] private Color poisonColor = Color.green;
+    [SerializeField] private Color stunColor = Color.yellow;
+    [SerializeField] private GameObject frostEffect;
+    [SerializeField] private GameObject poisonEffect;
+    [SerializeField] private GameObject stunEffect;
+
     [Header("Player Health and Stamina Settings")]
     [SerializeField] private float maxStamina = 100f;
     [SerializeField] private float staminaDrainRate = 10f; // per second while moving
@@ -46,8 +55,6 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private float stunRegenMultiplier = 5f; // Multiplier for stun regeneration
     private bool isStunned = false;
     private float currentStun = 0f;
-
-
     private bool isMoving = false;
 
     private void Awake()
@@ -67,6 +74,10 @@ public class PlayerStats : MonoBehaviour
         currentStamina = maxStamina;
         currentHealth = maxHealthAfterStamina;
 
+        frostEffect.SetActive(false);
+        poisonEffect.SetActive(false);
+        stunEffect.SetActive(false);
+
         Enemy.OnEnemyAttackedPlayer += damage =>
         {
             currentHealth -= damage;
@@ -77,6 +88,17 @@ public class PlayerStats : MonoBehaviour
         {
             this.isMoving = isMoving;
         };
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+
+        //reset the material color
+        playerMaterial.color = Color.white;
     }
 
     private void Update()
@@ -119,6 +141,8 @@ public class PlayerStats : MonoBehaviour
             {
                 isPoisoned = false;
                 currentPoison = 0f;
+                poisonEffect.SetActive(false);
+                playerMaterial.color = Color.white;
             }
         }
 
@@ -136,6 +160,8 @@ public class PlayerStats : MonoBehaviour
                 isFrosted = false;
                 currentFrost = 0f;
                 OnFrostProcced?.Invoke(false);
+                frostEffect.SetActive(false);
+                playerMaterial.color = Color.white;
             }
         }
 
@@ -153,6 +179,8 @@ public class PlayerStats : MonoBehaviour
                 isStunned = false;
                 currentStun = 0f;
                 OnStunProcced?.Invoke(false);
+                stunEffect.SetActive(false);
+                playerMaterial.color = Color.white;
             }
         }
 
@@ -191,6 +219,8 @@ public class PlayerStats : MonoBehaviour
                         if (currentFrost >= frostProcThreshhold)
                         {
                             OnFrostProcced?.Invoke(true);
+                            frostEffect.SetActive(true);
+                            playerMaterial.color = frostColor;
                             isFrosted = true;
                         }
                     }
@@ -203,6 +233,8 @@ public class PlayerStats : MonoBehaviour
                         if (currentPoison >= poisonProcThreshhold)
                         {
                             isPoisoned = true;
+                            poisonEffect.SetActive(true);
+                            playerMaterial.color = poisonColor;
                         }
                     }
                     break;
@@ -215,6 +247,8 @@ public class PlayerStats : MonoBehaviour
                         {
                             OnStunProcced?.Invoke(true);
                             isStunned = true;
+                            stunEffect.SetActive(true);
+                            playerMaterial.color = stunColor;
                         }
                     }
                     break;

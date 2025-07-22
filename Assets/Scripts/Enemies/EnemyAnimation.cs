@@ -4,9 +4,11 @@ using UnityEngine;
 public class EnemyAnimation : MonoBehaviour
 {
     [SerializeField] private Enemy enemy;
+    [SerializeField] private EnemyHealth enemyHealth;
     private Animator animator;
     public Action OnAnimationComplete;
     public Action OnMeleeAttackDamage;
+    public Action OnSupportComplete;
 
     private void Awake()
     {
@@ -19,19 +21,19 @@ public class EnemyAnimation : MonoBehaviour
 
     private void Start()
     {
-        if (enemy != null)
-        {
-            enemy.OnEnemyStateChange += HandleEnemyStateChange;
-        }
-        else
-        {
-            Debug.LogError("Enemy reference is not set.");
-        }
+        enemy.OnEnemyStateChange += HandleEnemyStateChange;
+        enemyHealth.OnEnemyDeath += HandleEnemyDeath;
+    }
+
+    private void HandleEnemyDeath()
+    {
+        animator.SetBool("isDead", true);
     }
 
     private void OnDestroy()
     {
         enemy.OnEnemyStateChange -= HandleEnemyStateChange;
+        enemyHealth.OnEnemyDeath -= HandleEnemyDeath;
     }
 
     private void HandleEnemyStateChange(Enemy.EnemyState state)
@@ -84,4 +86,13 @@ public class EnemyAnimation : MonoBehaviour
         OnMeleeAttackDamage?.Invoke();
     }
 
+    public void SupportComplete()
+    {
+        OnSupportComplete?.Invoke();
+    }
+
+    public void DeathAnimationComplete()
+    {
+        Destroy(enemy.gameObject);
+    }
 }

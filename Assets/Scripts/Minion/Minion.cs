@@ -7,6 +7,8 @@ public class Minion : MonoBehaviour {
     private Rigidbody rb;
     public static Action<Minion> OnMinionGrabbedOrAttacked;
     public static Action<Minion> OnMinionThrown;
+    public Action OnThisMinionGrabbed;
+    public Action OnThisMinionThrown;
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -35,6 +37,7 @@ public class Minion : MonoBehaviour {
     {
         rb.isKinematic = true;
         OnMinionGrabbedOrAttacked?.Invoke(this);
+        OnThisMinionGrabbed?.Invoke();
     }
 
     public void Throw(Vector3 throwDirection)
@@ -42,7 +45,8 @@ public class Minion : MonoBehaviour {
         rb.isKinematic = false;
         rb.linearVelocity = throwDirection;
         rb.angularVelocity = Vector3.zero; // Reset angular velocity to prevent spinning
-        
+
         OnMinionThrown?.Invoke(this);
-    }
+        OnThisMinionThrown?.Invoke();
+    }    
 }
