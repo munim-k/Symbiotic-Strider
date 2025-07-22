@@ -40,6 +40,8 @@ public class CinemachineTouchCamera : MonoBehaviour
 
     private void PlayerStats_OnPlayerUpgraded(float scale)
     {
+        if (minZoom > 15)
+            return;
         minZoom *= scale;
         maxZoom *= scale;
 

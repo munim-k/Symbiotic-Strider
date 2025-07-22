@@ -10,7 +10,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float movementSpeed = 3f;
     [SerializeField] private float playerRange = 6f;
     [SerializeField] private float meleeAttackRange = 2f;
-    [SerializeField] private float attackDelay = 2f;
+    [SerializeField] private float attackDelay = 8f;
     [SerializeField] private EnemyAnimation enemyAnimation;
     [SerializeField] private List<GameObject> projectilePrefabs;
     [SerializeField] private float damage = 10f;
@@ -84,6 +84,23 @@ public class Enemy : MonoBehaviour
                 }
             }
         };
+
+        EnemyManager.Instance.OnEnemySpawned += (Enemy enemy, float value) =>
+        {
+            if (enemy != this)
+                return;
+            if (transform.localScale.x < 0.8f)
+                transform.localScale = new Vector3(value, value, value);
+
+            movementSpeed *= value * 4;
+            agent.speed = movementSpeed;
+            meleeAttackRange *= value * 4;
+            damage *= value * 4;
+            rangeAttackBuildUp *= value * 4;
+            
+            if (attackDelay > 2)
+                attackDelay /= value * 4;
+        };
     }
     private void OnDestroy()
     {
@@ -95,7 +112,7 @@ public class Enemy : MonoBehaviour
     private void Update()
     {
         //check if the agent has reached the destination
-        if (agent.remainingDistance <= agent.stoppingDistance && !isAttackingOrSupporting)
+        if (agent.isOnNavMesh && agent.remainingDistance <= agent.stoppingDistance && !isAttackingOrSupporting)
         {
             OnEnemyStateChange?.Invoke(EnemyState.Idle);
         }
@@ -104,7 +121,7 @@ public class Enemy : MonoBehaviour
     private void HandleEnemySupport()
     {
         isAttackingOrSupporting = true;
-        agent.isStopped = true;
+        if(agent.isOnNavMesh) agent.isStopped = true;
 
         OnEnemyStateChange?.Invoke(EnemyState.Supporting);
     }
@@ -113,8 +130,8 @@ public class Enemy : MonoBehaviour
     {
         if (!isAttackingOrSupporting)
         {
-            agent.SetDestination(transform.position + movementVector);
-            agent.isStopped = false;
+            if(agent.isOnNavMesh) agent.SetDestination(transform.position + movementVector);
+            if(agent.isOnNavMesh) agent.isStopped = false;
 
             OnEnemyStateChange?.Invoke(EnemyState.Moving);
         }
@@ -125,7 +142,7 @@ public class Enemy : MonoBehaviour
     private void HandleEnemyAttack(Vector3 playerPos, EnemyBehaviourType.AttackType attackType, Minion closestMinion)
     {
         isAttackingOrSupporting = true;
-        agent.isStopped = true;
+        if(agent.isOnNavMesh) agent.isStopped = true;
         this.closestMinion = closestMinion;
 
         transform.LookAt(new Vector3(playerPos.x, transform.position.y, playerPos.z));

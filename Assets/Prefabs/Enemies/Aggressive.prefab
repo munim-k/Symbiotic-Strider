@@ -318,7 +318,7 @@ GameObject:
   - component: {fileID: 7507242237689112833}
   - component: {fileID: 7691602117237642850}
   m_Layer: 9
-  m_Name: Spider
+  m_Name: Aggressive
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -354,7 +354,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   behaviourType: 0
-  movementSpeed: 3
+  movementSpeed: 5
   playerRange: 6
   meleeAttackRange: 2
   attackDelay: 2
@@ -364,7 +364,7 @@ MonoBehaviour:
   - {fileID: 8501760681256968633, guid: 826cc69cd1240684daf719d58a345a19, type: 3}
   - {fileID: 8501760681256968633, guid: faec432cec5c28b43a0593eeb51929ea, type: 3}
   damage: 10
-  rangeAttackBuildUp: 5
+  rangeAttackBuildUp: 7
 --- !u!195 &7247416365042217020
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -421,8 +421,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyAnimation: {fileID: 8964005238591196503}
-  maxHealth: 100
-  maxShield: 100
+  maxHealth: 70
+  maxShield: 50
   healthIncreaseOnSupport: 10
   healthImage: {fileID: 2008739575309763040}
   shieldImage: {fileID: 5496621752931423934}

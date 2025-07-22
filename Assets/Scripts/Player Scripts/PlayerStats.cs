@@ -21,6 +21,7 @@ public class PlayerStats : MonoBehaviour
     public Action<UpgradeType, float> OnPlayerUpgradedSingle;
 
     //Events for UI to change the fill amounts
+    public Action<int, int> OnMaxEnemiesIncreased;
     public Action<float> OnStaminaChanged;
     public Action<float> OnMaxHealthChanged;
     public Action<float> OnHealthChanged;
@@ -124,6 +125,8 @@ public class PlayerStats : MonoBehaviour
         UpgradeUI.Instance.OnPoisonUpgraded += PoisonUpgrade;
         UpgradeUI.Instance.OnFrostUpgraded += FrostUpgrade;
         GlyphsUI.Instance.OnMountainButtonClicked += HealthUpgradeBetter;
+
+        OnMaxEnemiesIncreased?.Invoke(currentEnemiesEaten, maxNumberOfEnemiesNeededToUpgrade);
     }
 
     private void FrostUpgrade()
@@ -361,13 +364,16 @@ public class PlayerStats : MonoBehaviour
         currentEnemiesEaten++;
         if (currentEnemiesEaten >= maxNumberOfEnemiesNeededToUpgrade)
         {
-            transform.localScale += new Vector3(scale, scale, scale);
+            if (transform.localScale.x < 3)
+                transform.localScale += new Vector3(scale, scale, scale);
 
             float newScale = transform.localScale.x;
             OnPlayerUpgraded?.Invoke(newScale);
 
             maxNumberOfEnemiesNeededToUpgrade++;
             currentEnemiesEaten = 0;
+
+            OnMaxEnemiesIncreased?.Invoke(currentEnemiesEaten, maxNumberOfEnemiesNeededToUpgrade);
         }
     }
 }
