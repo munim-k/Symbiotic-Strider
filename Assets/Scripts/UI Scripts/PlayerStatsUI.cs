@@ -40,30 +40,35 @@ public class PlayerStatsUI : MonoBehaviour
     {
         if (type == PlayerStats.UpgradeType.Stamina)
         {
-            float width = staminaBarObject.GetComponent<RectTransform>().rect.width;
-            width *= scale;
-
-            staminaBarObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);            
+            SetScaleOfObject(staminaBarObject, scale);
         }
         else if (type == PlayerStats.UpgradeType.Health)
         {
-            float width = healthBarObject.GetComponent<RectTransform>().rect.width;
-            width *= scale;
-
-            healthBarObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);  
+            SetScaleOfObject(healthBarObject, scale);
+        }
+        else if (type == PlayerStats.UpgradeType.Stun)
+        {
+            SetScaleOfObject(stunBarObject, scale);
+        }
+        else if (type == PlayerStats.UpgradeType.Frost)
+        {
+            SetScaleOfObject(frostBarObject, scale);
         }
         else
         {
-            float width = poisonBarObject.GetComponent<RectTransform>().rect.width;
-            width *= scale;
-
-            poisonBarObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);  
-            stunBarObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);  
-            frostBarObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);  
+            SetScaleOfObject(poisonBarObject, scale);
         }
     }
 
-    private void OnDisable()
+    private void SetScaleOfObject(GameObject barObject, float scale)
+    {
+        float width = barObject.GetComponent<RectTransform>().rect.width;
+        width *= scale;
+
+        barObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
+    }
+
+    private void OnDestroy()
     {
         PlayerStats.Instance.OnStaminaChanged -= UpdateStaminaBar;
         PlayerStats.Instance.OnMaxHealthChanged -= UpdateMaxHealthBar;

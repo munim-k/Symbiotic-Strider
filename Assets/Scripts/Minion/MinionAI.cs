@@ -14,7 +14,7 @@ public class MinionAI : MonoBehaviour
     [SerializeField] private float rotationSpeed = 5f;
     [SerializeField] private LayerMask enemyLayer;
     [SerializeField] private MinionAnimation minionAnimation;
-    [SerializeField] private float damage = 10f;
+    public float damage = 10f;
     [SerializeField] private float waitTimeBetweenAttacks = 1f;
     private Enemy closestEnemy;
     private List<Enemy> enemies;
@@ -47,7 +47,6 @@ public class MinionAI : MonoBehaviour
         detectionRadius *= scale;
         speed *= scale;
         rotationSpeed *= scale;
-        damage *= scale;
 
         minion.OnThisMinionGrabbed += HandleMinionGrabbedOrAttacked;
         minion.OnThisMinionThrown += HandleMinionThrown;

@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Cinemachine;
+using System;
 
 public class CinemachineTouchCamera : MonoBehaviour
 {
@@ -28,6 +29,22 @@ public class CinemachineTouchCamera : MonoBehaviour
     {
         if (cineCam == null) cineCam = GetComponent<CinemachineCamera>();
         defaultPosition = cameraFollowTarget.position;
+
+        PlayerStats.Instance.OnPlayerUpgraded += PlayerStats_OnPlayerUpgraded;
+    }
+
+    private void OnDestroy()
+    {
+        PlayerStats.Instance.OnPlayerUpgraded -= PlayerStats_OnPlayerUpgraded;
+    }
+
+    private void PlayerStats_OnPlayerUpgraded(float scale)
+    {
+        minZoom *= scale;
+        maxZoom *= scale;
+
+        panLimitMin *= scale;
+        panLimitMax *= scale;
     }
 
     void Update()

@@ -14,7 +14,9 @@ public class PlayerStats : MonoBehaviour
     {
         Health,
         Stamina,
-        Resistance,
+        Frost,
+        Stun,
+        Poison
     }
     public Action<UpgradeType, float> OnPlayerUpgradedSingle;
 
@@ -74,6 +76,8 @@ public class PlayerStats : MonoBehaviour
     private bool isStunned = false;
     private float currentStun = 0f;
     private bool isMoving = false;
+    [SerializeField] private int maxNumberOfEnemiesNeededToUpgrade = 1;
+    private int currentEnemiesEaten = 0;
 
     private void Awake()
     {
@@ -94,7 +98,7 @@ public class PlayerStats : MonoBehaviour
         poisonProcThreshhold = originalPoisonProcThreshhold;
         frostProcThreshhold = originalFrostProcThreshhold;
         stunProcThreshhold = originalStunProcThreshhold;
-        
+
         currentStamina = maxStamina;
         currentHealth = maxHealthAfterStamina;
 
@@ -112,6 +116,43 @@ public class PlayerStats : MonoBehaviour
         {
             this.isMoving = isMoving;
         };
+
+
+        UpgradeUI.Instance.OnHealthUpgraded += HealthUpgrade;
+        UpgradeUI.Instance.OnStaminaUpgraded += StaminaUpgrade;
+        UpgradeUI.Instance.OnStunUpgraded += StunUpgrade;
+        UpgradeUI.Instance.OnPoisonUpgraded += PoisonUpgrade;
+        UpgradeUI.Instance.OnFrostUpgraded += FrostUpgrade;
+    }
+
+    private void FrostUpgrade()
+    {
+        frostProcThreshhold *= 1.2f;
+        OnPlayerUpgradedSingle?.Invoke(UpgradeType.Frost, frostProcThreshhold / originalFrostProcThreshhold);
+    }
+
+    private void PoisonUpgrade()
+    {
+        poisonProcThreshhold *= 1.2f;
+        OnPlayerUpgradedSingle?.Invoke(UpgradeType.Poison, poisonProcThreshhold / originalPoisonProcThreshhold);
+    }
+
+    private void StunUpgrade()
+    {
+        stunProcThreshhold *= 1.2f;
+        OnPlayerUpgradedSingle?.Invoke(UpgradeType.Stun, stunProcThreshhold / originalStunProcThreshhold);
+    }
+
+    private void StaminaUpgrade()
+    {
+        maxStamina *= 1.2f;
+        OnPlayerUpgradedSingle?.Invoke(UpgradeType.Stamina, maxStamina / originalMaxStamina);
+    }
+
+    private void HealthUpgrade()
+    {
+        maxHealth *= 1.2f;
+        OnPlayerUpgradedSingle?.Invoke(UpgradeType.Health, maxHealth / originalMaxHealth);
     }
 
     private void OnDestroy()
@@ -123,6 +164,11 @@ public class PlayerStats : MonoBehaviour
 
         //reset the material color
         playerMaterial.color = Color.white;
+        UpgradeUI.Instance.OnHealthUpgraded -= HealthUpgrade;
+        UpgradeUI.Instance.OnStaminaUpgraded -= StaminaUpgrade;
+        UpgradeUI.Instance.OnStunUpgraded -= StunUpgrade;
+        UpgradeUI.Instance.OnPoisonUpgraded -= PoisonUpgrade;
+        UpgradeUI.Instance.OnFrostUpgraded -= FrostUpgrade;
     }
 
     private void Update()
@@ -299,19 +345,16 @@ public class PlayerStats : MonoBehaviour
 
     private void UpgradePlayer(float scale)
     {
-        transform.localScale += new Vector3(scale, scale, scale);
+        currentEnemiesEaten++;
+        if (currentEnemiesEaten >= maxNumberOfEnemiesNeededToUpgrade)
+        {
+            transform.localScale += new Vector3(scale, scale, scale);
 
-        float newScale = transform.localScale.x;
-        OnPlayerUpgraded?.Invoke(newScale);
+            float newScale = transform.localScale.x;
+            OnPlayerUpgraded?.Invoke(newScale);
 
-        maxHealth = originalMaxHealth * newScale;
-        maxStamina = originalMaxStamina * newScale;
-        frostProcThreshhold = originalFrostProcThreshhold * newScale;
-        stunProcThreshhold = originalStunProcThreshhold * newScale;
-        poisonProcThreshhold = originalPoisonProcThreshhold * newScale;
-
-        OnPlayerUpgradedSingle?.Invoke(UpgradeType.Health, maxHealth / originalMaxHealth);
-        OnPlayerUpgradedSingle?.Invoke(UpgradeType.Stamina, maxStamina / originalMaxStamina);
-        OnPlayerUpgradedSingle?.Invoke(UpgradeType.Resistance, frostProcThreshhold / originalFrostProcThreshhold);
+            maxNumberOfEnemiesNeededToUpgrade++;
+            currentEnemiesEaten = 0;
+        }
     }
 }

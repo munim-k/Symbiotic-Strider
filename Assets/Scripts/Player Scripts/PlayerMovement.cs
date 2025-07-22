@@ -37,6 +37,14 @@ public class PlayerMovement : MonoBehaviour {
         PlayerStats.Instance.OnFrostProcced += HandleFrostProcced;
         PlayerStats.Instance.OnStunProcced += HandleStunProcced;
         PlayerStats.Instance.OnPlayerUpgraded += HandlePlayerUpgrade;
+
+        UpgradeUI.Instance.OnMoveSpeedUpgraded += MoveSpeedUpgraded;
+    }
+
+    private void MoveSpeedUpgraded()
+    {
+        minSpeed *= 1.2f;
+        maxSpeed *= 1.2f;
     }
 
     private void OnDestroy()
