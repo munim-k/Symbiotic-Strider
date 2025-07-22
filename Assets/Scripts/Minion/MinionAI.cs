@@ -43,6 +43,12 @@ public class MinionAI : MonoBehaviour
 
     private void Start()
     {
+        float scale = transform.localScale.x;
+        detectionRadius *= scale;
+        speed *= scale;
+        rotationSpeed *= scale;
+        damage *= scale;
+
         minion.OnThisMinionGrabbed += HandleMinionGrabbedOrAttacked;
         minion.OnThisMinionThrown += HandleMinionThrown;
 

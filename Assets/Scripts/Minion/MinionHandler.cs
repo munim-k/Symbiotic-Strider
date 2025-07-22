@@ -7,6 +7,7 @@ public class MinionHandler : MonoBehaviour
     public Action<Minion> OnMinionSpawned;
     [SerializeField] private Transform[] minionSpawnPoints;
     [SerializeField] private Transform minion;
+    [SerializeField] private PlayerMovement player;
 
     private void Awake()
     {
@@ -23,6 +24,7 @@ public class MinionHandler : MonoBehaviour
     public void SpawnMinion()
     {
         Transform newMinionTransform = Instantiate(minion, minionSpawnPoints[spawnIndex].position, Quaternion.identity);
+        newMinionTransform.localScale = player.transform.localScale;
         Minion newMinion = newMinionTransform.GetComponent<Minion>();
         spawnIndex++;
         spawnIndex %= minionSpawnPoints.Length;

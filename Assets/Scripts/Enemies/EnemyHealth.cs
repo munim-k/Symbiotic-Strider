@@ -28,7 +28,23 @@ public class EnemyHealth : MonoBehaviour
         MinionAI.OnEnemyAttacked += MinionAI_OnEnemyAttacked;
         enemyAnimation.OnSupportComplete += EnemyAnimation_OnSupportComplete;
         OnEnemySupported += Enemy_OnEnemySupported;
+        PlayerStats.Instance.OnEnemyConsumed += EnemyConsumed;
 
+        HandleUI();
+    }
+
+    private void EnemyConsumed(EnemyHealth obj)
+    {
+        if (obj != this)
+        {
+            return;
+        }
+
+        currentHealth = 0f;
+        currentShield = 0f;
+
+        OnEnemyDeath?.Invoke();
+        OnEnemyDied?.Invoke(gameObject.GetComponent<Enemy>());
         HandleUI();
     }
 
@@ -112,5 +128,19 @@ public class EnemyHealth : MonoBehaviour
         MinionAI.OnEnemyAttacked -= MinionAI_OnEnemyAttacked;
         enemyAnimation.OnSupportComplete -= EnemyAnimation_OnSupportComplete;
         OnEnemySupported -= Enemy_OnEnemySupported;
+        PlayerStats.Instance.OnEnemyConsumed -= EnemyConsumed;
+    }
+
+    public float GetCurrentHealth()
+    {
+        return currentHealth + currentShield;
+    }
+    public float GetMaxHealth()
+    {
+        return maxHealth + maxShield;
+    }
+    public float GetCurrentScale()
+    {
+        return transform.localScale.x;
     }
 }

@@ -7,8 +7,12 @@ public class PlayerMovement : MonoBehaviour {
     private NavMeshAgent agent;
     private bool isTouching = false;
     [SerializeField] private GameObject touchIndicatorObject;
-    [SerializeField] private float maxSpeed = 5f; // Maximum speed of the player
-    [SerializeField] private float minSpeed = 1f; // Minimum speed of the player when stamina is low
+
+    private float originalMaxSpeed = 5f;
+    private float originalMinSpeed = 1f;
+
+    private float maxSpeed = 5f; // Maximum speed of the player
+    private float minSpeed = 1f; // Minimum speed of the player when stamina is low
     private bool moving = false;
     public Action<bool> OnMove;
 
@@ -25,16 +29,27 @@ public class PlayerMovement : MonoBehaviour {
     }
     void Start()
     {
+        maxSpeed = originalMaxSpeed;
+        minSpeed = originalMinSpeed;
+
         agent = GetComponent<NavMeshAgent>();
 
         PlayerStats.Instance.OnFrostProcced += HandleFrostProcced;
         PlayerStats.Instance.OnStunProcced += HandleStunProcced;
+        PlayerStats.Instance.OnPlayerUpgraded += HandlePlayerUpgrade;
     }
 
     private void OnDestroy()
     {
         PlayerStats.Instance.OnFrostProcced -= HandleFrostProcced;
         PlayerStats.Instance.OnStunProcced -= HandleStunProcced;
+        PlayerStats.Instance.OnPlayerUpgraded -= HandlePlayerUpgrade;
+    }
+
+    private void HandlePlayerUpgrade(float scale)
+    {
+        maxSpeed = originalMaxSpeed * scale;
+        minSpeed = originalMinSpeed * scale;
     }
 
     private void HandleStunProcced(bool obj)

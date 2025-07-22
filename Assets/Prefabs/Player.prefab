@@ -14747,8 +14747,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   touchIndicatorObject: {fileID: 0}
-  maxSpeed: 5
-  minSpeed: 1
 --- !u!114 &6108282097912041647
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14797,16 +14795,16 @@ MonoBehaviour:
   frostEffect: {fileID: 525391353387816779}
   poisonEffect: {fileID: 1858766181667130955}
   stunEffect: {fileID: 3967320384686130098}
-  maxStamina: 100
+  originalMaxHealth: 100
+  originalMaxStamina: 100
   staminaDrainRate: 10
   staminaRegenRate: 5
-  maxHealth: 100
   poisonDamagePerSecond: 1
-  poisonProcThreshhold: 50
+  originalPoisonProcThreshhold: 50
   poisonRegenMultiplier: 1
-  frostProcThreshhold: 50
+  originalFrostProcThreshhold: 50
   frostRegenMultiplier: 2.5
-  stunProcThreshhold: 50
+  originalStunProcThreshhold: 50
   stunRegenMultiplier: 5
 --- !u!136 &2732389788415557408
 CapsuleCollider:
@@ -14910,6 +14908,7 @@ MonoBehaviour:
   - {fileID: 8217890055956506806}
   - {fileID: 6981357843657396810}
   minion: {fileID: 2942048566956984310, guid: 2692e0fcbd98bc140bbf567ae6c5109b, type: 3}
+  player: {fileID: 3249066036302427668}
 --- !u!1 &8351471169269849471
 GameObject:
   m_ObjectHideFlags: 0

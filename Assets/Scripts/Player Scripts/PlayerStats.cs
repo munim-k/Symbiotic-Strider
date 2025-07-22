@@ -2,11 +2,21 @@ using UnityEngine;
 using System;
 using UnityEngine.UI;
 using TMPro;
+using System.Diagnostics;
 
 public class PlayerStats : MonoBehaviour
 {
     // Singleton instance
     public static PlayerStats Instance { get; private set; }
+
+    //Action for upgrade to send to UI with the scale of the thing
+    public enum UpgradeType
+    {
+        Health,
+        Stamina,
+        Resistance,
+    }
+    public Action<UpgradeType, float> OnPlayerUpgradedSingle;
 
     //Events for UI to change the fill amounts
     public Action<float> OnStaminaChanged;
@@ -18,6 +28,9 @@ public class PlayerStats : MonoBehaviour
 
     public Action<bool> OnFrostProcced;
     public Action<bool> OnStunProcced;
+    public Action<EnemyHealth> OnEnemyConsumed;
+
+    public Action<float> OnPlayerUpgraded;
 
     [Header("Player Shader Settings")]
     [SerializeField] private Material playerMaterial;
@@ -29,30 +42,35 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private GameObject stunEffect;
 
     [Header("Player Health and Stamina Settings")]
-    [SerializeField] private float maxStamina = 100f;
+    [SerializeField] private float originalMaxHealth = 100f; // Maximum health of the player
+    [SerializeField] private float originalMaxStamina = 100f;
     [SerializeField] private float staminaDrainRate = 10f; // per second while moving
     [SerializeField] private float staminaRegenRate = 5f;  // per second while idle
-    [SerializeField] private float maxHealth = 100f; // Maximum health of the player
+    private float maxHealth;
+    private float maxStamina;
     private float maxHealthAfterStamina = 100f;
     private float currentHealth; // Current health of the player
     private float currentStamina;
 
     [Header("Player Status Effects Settings\n Player Poison Settings")]
-    [SerializeField] private float poisonDamagePerSecond = 1f; // Damage per second from poison
-    [SerializeField] private float poisonProcThreshhold = 50f;
+    [SerializeField] private float poisonDamagePerSecond = 1.5f; // Damage per second from poison
+    [SerializeField] private float originalPoisonProcThreshhold = 50f;
     [SerializeField] private float poisonRegenMultiplier = 1f; // Multiplier for poison regeneration
+    private float poisonProcThreshhold;
     private bool isPoisoned = false;
     private float currentPoison = 0f;
 
     [Header("Player Frost Settings")]
-    [SerializeField] private float frostProcThreshhold = 50f; // Threshold for frost effect to apply
+    [SerializeField] private float originalFrostProcThreshhold = 50f; // Threshold for frost effect to apply
     [SerializeField] private float frostRegenMultiplier = 2.5f; // Multiplier for frost regeneration
+    private float frostProcThreshhold;
     private float currentFrost = 0f;
     private bool isFrosted = false;
 
     [Header("Player Stun Settings")]
-    [SerializeField] private float stunProcThreshhold = 50f; // Threshold for stun effect to apply
+    [SerializeField] private float originalStunProcThreshhold = 50f; // Threshold for stun effect to apply
     [SerializeField] private float stunRegenMultiplier = 5f; // Multiplier for stun regeneration
+    private float stunProcThreshhold; // Threshold for stun effect to apply
     private bool isStunned = false;
     private float currentStun = 0f;
     private bool isMoving = false;
@@ -71,6 +89,12 @@ public class PlayerStats : MonoBehaviour
 
     private void Start()
     {
+        maxHealth = originalMaxHealth;
+        maxStamina = originalMaxStamina;
+        poisonProcThreshhold = originalPoisonProcThreshhold;
+        frostProcThreshhold = originalFrostProcThreshhold;
+        stunProcThreshhold = originalStunProcThreshhold;
+        
         currentStamina = maxStamina;
         currentHealth = maxHealthAfterStamina;
 
@@ -207,13 +231,13 @@ public class PlayerStats : MonoBehaviour
         ProjectileType projectileType;
         other.TryGetComponent(out projectileType);
 
-        if(projectileType != null)
+        if (projectileType != null)
         {
             switch (projectileType.projectileType)
             {
                 case ProjectileType.Projectile_Type.Frost:
                     //apply frost effect
-                    if(!isFrosted)
+                    if (!isFrosted)
                     {
                         currentFrost += projectileType.procBuildUp;
                         if (currentFrost >= frostProcThreshhold)
@@ -254,5 +278,40 @@ public class PlayerStats : MonoBehaviour
                     break;
             }
         }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        other.TryGetComponent(out EnemyHealth enemyHealth);
+
+        if (enemyHealth == null || enemyHealth.GetCurrentHealth() == 0f)
+        {
+            return;
+        }
+        float minHealthRequiredToConsume = enemyHealth.GetMaxHealth() / 4;
+        if (enemyHealth.GetCurrentHealth() <= minHealthRequiredToConsume)
+        {
+            OnEnemyConsumed?.Invoke(enemyHealth);
+
+            UpgradePlayer(enemyHealth.GetCurrentScale() / 7.5f);
+        }
+    }
+
+    private void UpgradePlayer(float scale)
+    {
+        transform.localScale += new Vector3(scale, scale, scale);
+
+        float newScale = transform.localScale.x;
+        OnPlayerUpgraded?.Invoke(newScale);
+
+        maxHealth = originalMaxHealth * newScale;
+        maxStamina = originalMaxStamina * newScale;
+        frostProcThreshhold = originalFrostProcThreshhold * newScale;
+        stunProcThreshhold = originalStunProcThreshhold * newScale;
+        poisonProcThreshhold = originalPoisonProcThreshhold * newScale;
+
+        OnPlayerUpgradedSingle?.Invoke(UpgradeType.Health, maxHealth / originalMaxHealth);
+        OnPlayerUpgradedSingle?.Invoke(UpgradeType.Stamina, maxStamina / originalMaxStamina);
+        OnPlayerUpgradedSingle?.Invoke(UpgradeType.Resistance, frostProcThreshhold / originalFrostProcThreshhold);
     }
 }
