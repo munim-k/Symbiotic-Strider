@@ -32,7 +32,7 @@ public class PlayerStats : MonoBehaviour
     public Action<bool> OnFrostProcced;
     public Action<bool> OnStunProcced;
     public Action<EnemyHealth> OnEnemyConsumed;
-
+    public Action<bool> OnPlayerDeath;
     public Action<float> OnPlayerUpgraded;
 
     [Header("Player Shader Settings")]
@@ -46,14 +46,14 @@ public class PlayerStats : MonoBehaviour
 
     [Header("Player Health and Stamina Settings")]
     [SerializeField] private float originalMaxHealth = 100f; // Maximum health of the player
-    [SerializeField] private float originalMaxStamina = 100f;
+    [SerializeField] private float originalMaxStamina = 200f;
     [SerializeField] private float staminaDrainRate = 2.5f; // per second while moving
     [SerializeField] private float staminaRegenRate = 10f;  // per second while idle
     private float maxHealth;
     private float maxStamina;
     private float maxHealthAfterStamina = 100f;
     private float currentHealth; // Current health of the player
-    private float currentStamina;
+    [HideInInspector] public float currentStamina;
 
     [Header("Player Status Effects Settings\n Player Poison Settings")]
     [SerializeField] private float poisonDamagePerSecond = 1.5f; // Damage per second from poison
@@ -79,6 +79,7 @@ public class PlayerStats : MonoBehaviour
     private bool isMoving = false;
     [SerializeField] private int maxNumberOfEnemiesNeededToUpgrade = 1;
     private int currentEnemiesEaten = 0;
+    private int numberOfTimesRevived = 0;
 
     private void Awake()
     {
@@ -95,7 +96,7 @@ public class PlayerStats : MonoBehaviour
     private void Start()
     {
         maxHealth = originalMaxHealth;
-        maxStamina = originalMaxStamina * 2;
+        maxStamina = originalMaxStamina;
         poisonProcThreshhold = originalPoisonProcThreshhold;
         frostProcThreshhold = originalFrostProcThreshhold;
         stunProcThreshhold = originalStunProcThreshhold;
@@ -111,6 +112,8 @@ public class PlayerStats : MonoBehaviour
         {
             currentHealth -= damage;
             currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealthAfterStamina);
+            if (currentHealth == 0f)
+                OnPlayerDeath?.Invoke(numberOfTimesRevived == 0);
         };
 
         PlayerMovement.Instance.OnMove += isMoving =>
@@ -118,15 +121,28 @@ public class PlayerStats : MonoBehaviour
             this.isMoving = isMoving;
         };
 
+        DeathUI.Instance.OnPlayerRevived += () =>
+        {
+            currentHealth = maxHealth / 2;
+            numberOfTimesRevived++;
+        };
 
         UpgradeUI.Instance.OnHealthUpgraded += HealthUpgrade;
         UpgradeUI.Instance.OnStaminaUpgraded += StaminaUpgrade;
         UpgradeUI.Instance.OnStunUpgraded += StunUpgrade;
         UpgradeUI.Instance.OnPoisonUpgraded += PoisonUpgrade;
         UpgradeUI.Instance.OnFrostUpgraded += FrostUpgrade;
-        GlyphsUI.Instance.OnMountainButtonClicked += HealthUpgradeBetter;
+        GlyphsUI.Instance.OnFortressButtonClicked += HealthUpgradeBetter;
+        GlyphsUI.Instance.OnMountainButtonClicked += ResistanceUpgrade;
 
         OnMaxEnemiesIncreased?.Invoke(currentEnemiesEaten, maxNumberOfEnemiesNeededToUpgrade);
+    }
+
+    private void ResistanceUpgrade()
+    {
+        frostProcThreshhold *= 2;
+        poisonProcThreshhold *= 2;
+        stunProcThreshhold *= 2;
     }
 
     private void FrostUpgrade()
@@ -185,6 +201,7 @@ public class PlayerStats : MonoBehaviour
         UpgradeUI.Instance.OnPoisonUpgraded -= PoisonUpgrade;
         UpgradeUI.Instance.OnFrostUpgraded -= FrostUpgrade;
         GlyphsUI.Instance.OnFortressButtonClicked -= HealthUpgradeBetter;
+        GlyphsUI.Instance.OnMountainButtonClicked -= ResistanceUpgrade;
     }
 
 
@@ -223,6 +240,10 @@ public class PlayerStats : MonoBehaviour
             currentPoison -= poisonRegenMultiplier / 2 * Time.deltaTime;
             currentHealth -= poisonDamagePerSecond * Time.deltaTime;
             currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealthAfterStamina);
+            if (currentHealth == 0f)
+            {
+                OnPlayerDeath?.Invoke(numberOfTimesRevived == 0);
+            }
 
             if (currentPoison <= 0f)
             {
@@ -367,7 +388,7 @@ public class PlayerStats : MonoBehaviour
         {
             if (transform.localScale.x < 3)
                 transform.localScale += new Vector3(scale, scale, scale);
-
+            
             float newScale = transform.localScale.x;
             OnPlayerUpgraded?.Invoke(newScale);
 

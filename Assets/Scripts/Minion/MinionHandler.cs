@@ -8,6 +8,7 @@ public class MinionHandler : MonoBehaviour
     [SerializeField] private Transform[] minionSpawnPoints;
     [SerializeField] private Transform minion;
     [SerializeField] private PlayerMovement player;
+    [SerializeField] private PlayerStats playerStats;
 
     private float damage = 10f;
 
@@ -47,6 +48,9 @@ public class MinionHandler : MonoBehaviour
     int spawnIndex = 0;
     public void SpawnMinion()
     {
+        if (playerStats.currentStamina < 10f)
+            return;
+        playerStats.currentStamina -= 10f;
         Transform newMinionTransform = Instantiate(minion, minionSpawnPoints[spawnIndex].position, Quaternion.identity);
         newMinionTransform.localScale = player.transform.localScale;
         Minion newMinion = newMinionTransform.GetComponent<Minion>();

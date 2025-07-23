@@ -70,9 +70,6 @@ public class EnemyManager : MonoBehaviour
                 OnEnemySpawned?.Invoke(enemy, value);
             }
         }
-
-        if (enemySpawnTime > 15f)
-            enemySpawnTime -= updatePerSecond * Time.deltaTime;
         value += updatePerSecond * Time.deltaTime;
         if (spawnRadius < 30f)
             spawnRadius += updatePerSecond * Time.deltaTime;

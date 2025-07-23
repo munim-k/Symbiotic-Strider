@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -90,6 +91,8 @@ public class UpgradeUI : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (PlayerStats.Instance == null)
+            return;
         PlayerStats.Instance.OnPlayerUpgraded -= PlayerStats_OnPlayerUpgraded;
     }
 }

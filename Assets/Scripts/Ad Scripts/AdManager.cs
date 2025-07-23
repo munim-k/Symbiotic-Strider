@@ -107,13 +107,13 @@ public class AdManager : MonoBehaviour
         }
     }
 
-    public void ShowRewardedAd()
+    public void ShowRewardedAd(Action callback)
     {
         if (rewardedAd != null && rewardedAd.CanShowAd())
         {
             rewardedAd.Show(reward =>
             {
-                //wouldnt work in editor
+                callback?.Invoke();
             });
             LoadRewardedAd();
         }

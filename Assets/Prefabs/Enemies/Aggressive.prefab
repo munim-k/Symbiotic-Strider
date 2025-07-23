@@ -357,7 +357,7 @@ MonoBehaviour:
   movementSpeed: 5
   playerRange: 6
   meleeAttackRange: 2
-  attackDelay: 6
+  attackDelay: 5
   enemyAnimation: {fileID: 8964005238591196503}
   projectilePrefabs:
   - {fileID: 8501760681256968633, guid: 772bd2b08ef805c448d7d29efe7de6d6, type: 3}
@@ -421,9 +421,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyAnimation: {fileID: 8964005238591196503}
-  maxHealth: 70
-  maxShield: 50
-  healthIncreaseOnSupport: 10
+  maxHealth: 30
+  maxShield: 30
+  healthIncreaseOnSupport: 5
   healthImage: {fileID: 2008739575309763040}
   shieldImage: {fileID: 5496621752931423934}
   shieldObject: {fileID: 2542546121022528241}

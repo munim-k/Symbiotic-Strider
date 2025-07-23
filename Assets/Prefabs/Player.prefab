@@ -14746,6 +14746,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c65acd0408825134eae5b131e645ca7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  agent: {fileID: 0}
   touchIndicatorObject: {fileID: 0}
 --- !u!114 &6108282097912041647
 MonoBehaviour:
@@ -14799,6 +14800,7 @@ MonoBehaviour:
   originalMaxStamina: 100
   staminaDrainRate: 10
   staminaRegenRate: 5
+  currentStamina: 0
   poisonDamagePerSecond: 1
   originalPoisonProcThreshhold: 50
   poisonRegenMultiplier: 1
@@ -14910,6 +14912,7 @@ MonoBehaviour:
   - {fileID: 6981357843657396810}
   minion: {fileID: 2942048566956984310, guid: 2692e0fcbd98bc140bbf567ae6c5109b, type: 3}
   player: {fileID: 3249066036302427668}
+  playerStats: {fileID: 7848659290024261269}
 --- !u!1 &8351471169269849471
 GameObject:
   m_ObjectHideFlags: 0

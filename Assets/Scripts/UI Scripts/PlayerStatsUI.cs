@@ -70,13 +70,14 @@ public class PlayerStatsUI : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (PlayerStats.Instance == null)
+            return;
         PlayerStats.Instance.OnStaminaChanged -= UpdateStaminaBar;
         PlayerStats.Instance.OnMaxHealthChanged -= UpdateMaxHealthBar;
         PlayerStats.Instance.OnHealthChanged -= UpdateHealthBar;
         PlayerStats.Instance.OnPoisonChanged -= UpdatePoisonBar;
         PlayerStats.Instance.OnFrostChanged -= UpdateFrostBar;
         PlayerStats.Instance.OnStunChanged -= UpdateStunBar;
-
         PlayerStats.Instance.OnPlayerUpgradedSingle -= PlayerUpgradeSingle;
     }
 

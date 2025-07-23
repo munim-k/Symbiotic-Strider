@@ -35,7 +35,8 @@ public class CinemachineTouchCamera : MonoBehaviour
 
     private void OnDestroy()
     {
-        PlayerStats.Instance.OnPlayerUpgraded -= PlayerStats_OnPlayerUpgraded;
+        if(PlayerStats.Instance != null)
+            PlayerStats.Instance.OnPlayerUpgraded -= PlayerStats_OnPlayerUpgraded;
     }
 
     private void PlayerStats_OnPlayerUpgraded(float scale)

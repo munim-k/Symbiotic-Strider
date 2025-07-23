@@ -128,7 +128,9 @@ public class EnemyHealth : MonoBehaviour
         MinionAI.OnEnemyAttacked -= MinionAI_OnEnemyAttacked;
         enemyAnimation.OnSupportComplete -= EnemyAnimation_OnSupportComplete;
         OnEnemySupported -= Enemy_OnEnemySupported;
-        PlayerStats.Instance.OnEnemyConsumed -= EnemyConsumed;
+
+        if(PlayerStats.Instance != null)
+            PlayerStats.Instance.OnEnemyConsumed -= EnemyConsumed;
     }
 
     public float GetCurrentHealth()
