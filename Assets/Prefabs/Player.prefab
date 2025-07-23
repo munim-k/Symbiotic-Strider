@@ -14759,8 +14759,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 835a3975ce7f0404abf039a9960e0679, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minionTapDetectionRadius: 2
-  minionWalkDetectionRadius: 2
+  minionTapDetectionRadius: 4
+  minionWalkDetectionRadius: 4
   groundLayer:
     serializedVersion: 2
     m_Bits: 64

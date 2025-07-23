@@ -1,10 +1,11 @@
 using System;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.EventSystems;
 
 public class PlayerMovement : MonoBehaviour {
     public static PlayerMovement Instance { get; private set; }
-    private NavMeshAgent agent;
+    public NavMeshAgent agent;
     [SerializeField] private GameObject touchIndicatorObject;
 
     private float originalMaxSpeed = 5f;
@@ -146,7 +147,7 @@ public class PlayerMovement : MonoBehaviour {
 
     void HandleInput() {
 #if UNITY_EDITOR || UNITY_STANDALONE
-        if (Input.GetMouseButtonDown(0) && PlayerStats.Instance.GetCurrentStamina() > 0f) {
+        if (Input.GetMouseButtonDown(0) && PlayerStats.Instance.GetCurrentStamina() > 0f && !EventSystem.current.IsPointerOverGameObject()) {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit)) {
                 agent.SetDestination(hit.point);
@@ -155,6 +156,9 @@ public class PlayerMovement : MonoBehaviour {
 #elif UNITY_ANDROID || UNITY_IOS
     if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began && currentStamina > 0f)
     {
+        int fingerId = Input.GetTouch(0).fingerId;
+        if(EventSystem.current.IsPointerOverGameObject(fingerId))
+            return;
         Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
         if (Physics.Raycast(ray, out RaycastHit hit))
         {

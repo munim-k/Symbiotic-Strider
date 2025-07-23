@@ -87,7 +87,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.33, y: 0.5, z: 0.22}
+  m_Size: {x: 0.33, y: 0.5, z: 0.33}
   m_Center: {x: 0, y: 0.25, z: 0}
 --- !u!54 &4832745771452699043
 Rigidbody:
@@ -148,7 +148,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   minionAnimation: {fileID: 5100707935973445353}
-  damage: 10
+  damage: 7
   waitTimeBetweenAttacks: 0.5
 --- !u!1001 &1208247355406981309
 PrefabInstance:

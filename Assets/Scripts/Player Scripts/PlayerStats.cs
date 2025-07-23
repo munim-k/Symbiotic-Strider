@@ -47,8 +47,8 @@ public class PlayerStats : MonoBehaviour
     [Header("Player Health and Stamina Settings")]
     [SerializeField] private float originalMaxHealth = 100f; // Maximum health of the player
     [SerializeField] private float originalMaxStamina = 100f;
-    [SerializeField] private float staminaDrainRate = 10f; // per second while moving
-    [SerializeField] private float staminaRegenRate = 5f;  // per second while idle
+    [SerializeField] private float staminaDrainRate = 2.5f; // per second while moving
+    [SerializeField] private float staminaRegenRate = 10f;  // per second while idle
     private float maxHealth;
     private float maxStamina;
     private float maxHealthAfterStamina = 100f;
@@ -95,7 +95,7 @@ public class PlayerStats : MonoBehaviour
     private void Start()
     {
         maxHealth = originalMaxHealth;
-        maxStamina = originalMaxStamina;
+        maxStamina = originalMaxStamina * 2;
         poisonProcThreshhold = originalPoisonProcThreshhold;
         frostProcThreshhold = originalFrostProcThreshhold;
         stunProcThreshhold = originalStunProcThreshhold;
@@ -150,6 +150,7 @@ public class PlayerStats : MonoBehaviour
     private void StaminaUpgrade()
     {
         maxStamina *= 1.1f;
+        currentStamina = maxStamina;
         OnPlayerUpgradedSingle?.Invoke(UpgradeType.Stamina, maxStamina / originalMaxStamina);
     }
 
@@ -372,8 +373,7 @@ public class PlayerStats : MonoBehaviour
 
             maxNumberOfEnemiesNeededToUpgrade++;
             currentEnemiesEaten = 0;
-
-            OnMaxEnemiesIncreased?.Invoke(currentEnemiesEaten, maxNumberOfEnemiesNeededToUpgrade);
         }
+        OnMaxEnemiesIncreased?.Invoke(currentEnemiesEaten, maxNumberOfEnemiesNeededToUpgrade);
     }
 }

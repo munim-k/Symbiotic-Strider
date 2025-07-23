@@ -1025,7 +1025,7 @@ MonoBehaviour:
   aggressiveEnemyPrefab: {fileID: 7973787981153683773, guid: 082f5e9ac230e5e4498923613b3d7436, type: 3}
   defensiveEnemyPrefab: {fileID: 7973787981153683773, guid: d983dde5ba6ed0e4497d89d5263cc4d5, type: 3}
   hybridEnemyPrefab: {fileID: 7973787981153683773, guid: 86d3b6e5c197f0b4ea70b134318a592e, type: 3}
-  enemySpawnTime: 40
+  enemySpawnTime: 25
   value: 0.25
   spawnRadius: 10
   numberOfEnemies: 1
@@ -4908,9 +4908,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '1/2
-
-'
+  m_text: 0/1
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -6663,6 +6661,14 @@ PrefabInstance:
     - target: {fileID: 4390936203265666337, guid: d9871b1337e8d8e4ca380cf4ad2f9541, type: 3}
       propertyPath: m_ConstrainProportionsScale
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108282097912041647, guid: d9871b1337e8d8e4ca380cf4ad2f9541, type: 3}
+      propertyPath: minionTapDetectionRadius
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108282097912041647, guid: d9871b1337e8d8e4ca380cf4ad2f9541, type: 3}
+      propertyPath: minionWalkDetectionRadius
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6534486066102693882, guid: d9871b1337e8d8e4ca380cf4ad2f9541, type: 3}
       propertyPath: m_Name

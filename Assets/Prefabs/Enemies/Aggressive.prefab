@@ -357,14 +357,14 @@ MonoBehaviour:
   movementSpeed: 5
   playerRange: 6
   meleeAttackRange: 2
-  attackDelay: 2
+  attackDelay: 6
   enemyAnimation: {fileID: 8964005238591196503}
   projectilePrefabs:
   - {fileID: 8501760681256968633, guid: 772bd2b08ef805c448d7d29efe7de6d6, type: 3}
   - {fileID: 8501760681256968633, guid: 826cc69cd1240684daf719d58a345a19, type: 3}
   - {fileID: 8501760681256968633, guid: faec432cec5c28b43a0593eeb51929ea, type: 3}
   damage: 10
-  rangeAttackBuildUp: 7
+  rangeAttackBuildUp: 20
 --- !u!195 &7247416365042217020
 NavMeshAgent:
   m_ObjectHideFlags: 0
