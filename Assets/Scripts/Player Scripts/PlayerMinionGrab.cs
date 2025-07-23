@@ -151,7 +151,7 @@ public class PlayerMinionGrab : MonoBehaviour {
         } else if (grablerp < 2f) {
             float returnLerp = grablerp - 1f;
             IKTargets[currentIKTarget].position = Vector3.Lerp(grabTargetPosition, IKTargetOriginals[currentIKTarget].position, returnLerp);
-            currentMinion.transform.position = IKTargets[currentIKTarget].position;
+            if(currentMinion != null) currentMinion.transform.position = IKTargets[currentIKTarget].position;
         } else {
             grablerp = 0f;
             state = State.Grabbed;
