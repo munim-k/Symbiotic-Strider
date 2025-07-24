@@ -17,11 +17,9 @@ public class MinionAI : MonoBehaviour
     public float damage = 10f;
     [SerializeField] private float waitTimeBetweenAttacks = 1f;
     private Enemy closestEnemy;
-    private HashSet<GameObject> enemies;
     private float attackRange = 1.0f;
     private bool isGrabbed = false;
     private bool isAttacking = false;
-    private bool shouldAdd = true;
     public enum MinionState
     {
         Idle,
@@ -35,11 +33,6 @@ public class MinionAI : MonoBehaviour
 
     public static Action<Enemy, float> OnEnemyAttacked;
 
-
-    private void Awake()
-    {
-        enemies = new HashSet<GameObject>();
-    }
 
     private void Start()
     {
@@ -57,15 +50,13 @@ public class MinionAI : MonoBehaviour
 
     private void EnemyHealth_OnEnemyDeath(Enemy enemy)
     {
-        enemies.Clear();
-        shouldAdd = false;
+        closestEnemy = null;
         StartCoroutine(DelayToAggro());
     }
 
     private IEnumerator DelayToAggro()
     {
-        yield return new WaitForSeconds(0.5f);
-        shouldAdd = true;
+        yield return new WaitForSeconds(1f);
     }
 
     private void HandleAttackAnimationComplete()
@@ -99,10 +90,7 @@ public class MinionAI : MonoBehaviour
     {
         isGrabbed = true;
         SetState(MinionState.Idle);
-        if (enemies != null)
-        {
-            enemies.Clear(); // Clear the list of enemies when the minion is grabbed or attacked
-        }
+        closestEnemy = null;
     }
 
     private void FixedUpdate()
@@ -116,36 +104,14 @@ public class MinionAI : MonoBehaviour
 
     private void HandleMinionMovement()
     {
-        enemies.RemoveWhere(e => e == null || !e.gameObject.activeInHierarchy);
-        //check which enemy is the closest
-        Enemy closestEnemy = null;
-        float closestDistance = float.MaxValue;
-        foreach (GameObject enemyObject in enemies)
-        {
-            Enemy enemy = enemyObject.GetComponent<Enemy>();
-            if (enemy == null || !enemy.gameObject.activeInHierarchy)
-            {
-                continue;
-            }
-
-            float distance = Vector3.Distance(transform.position, enemy.transform.position);
-            if (distance < closestDistance)
-            {
-                closestDistance = distance;
-                closestEnemy = enemy;
-            }
-        }
-
         if (closestEnemy == null)
         {
             SetState(MinionState.Idle);
             return;
         }
 
-        this.closestEnemy = closestEnemy;
-
         // Check if the closest enemy is within attack range
-        if (closestDistance <= attackRange && !isAttacking)
+        if (Vector3.Distance(closestEnemy.transform.position, transform.position) <= attackRange && !isAttacking)
         {
             SetState(MinionState.Attacking);
             isAttacking = true;
@@ -167,16 +133,18 @@ public class MinionAI : MonoBehaviour
 
     private void HandleCollisionsWithEnemies()
     {
-        enemies.RemoveWhere(e => e == null || !e.gameObject.activeInHierarchy);
-
         Collider[] hits = Physics.OverlapSphere(transform.position, detectionRadius, enemyLayer);
+
+        Enemy cEnemy = null;
+        float cDistance = float.MaxValue;
         foreach (Collider hit in hits)
         {
-            if (hit.TryGetComponent(out Enemy enemy) && enemy.gameObject.activeInHierarchy && shouldAdd)
+            if (hit.TryGetComponent(out Enemy enemy) && enemy.gameObject.activeInHierarchy && cDistance > Vector3.Distance(enemy.transform.position, transform.position))
             {
-                enemies.Add(enemy.gameObject);
+                cEnemy = enemy;
             }
         }
+        closestEnemy = cEnemy;
 
     }
 
