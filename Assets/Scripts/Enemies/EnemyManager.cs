@@ -1,11 +1,14 @@
 using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
 {
+    private List<Enemy> enemiesSpawned;
     public static EnemyManager Instance { get; private set; }
     public Action<Enemy, float> OnEnemySpawned;
+    public Action<bool> OnCanTimeSkip;
     public Action<float, float> OnTimerChanged;
     [SerializeField] private Enemy aggressiveEnemyPrefab;
     [SerializeField] private Enemy defensiveEnemyPrefab;
@@ -30,18 +33,42 @@ public class EnemyManager : MonoBehaviour
     }
     private void Start()
     {
+        enemiesSpawned = new List<Enemy>();
         enemySpawnTimer = enemySpawnTime;
         GlyphsUI.Instance.OnCometButtonClicked += StartSpawning;
         GlyphsUI.Instance.OnFortressButtonClicked += StartSpawning;
         GlyphsUI.Instance.OnLanceButtonClicked += StartSpawning;
         GlyphsUI.Instance.OnMountainButtonClicked += StartSpawning;
+        EnemyHealth.OnEnemyDied += OnEnemyDeath;
+        EnemyUpdateUI.Instance.OnTimeSkipped += OnTimeSkipped;
     }
+
+    private void OnTimeSkipped()
+    {
+        enemySpawnTimer = enemySpawnTime;
+    }
+
+    private void OnEnemyDeath(Enemy enemy)
+    {
+        if (enemiesSpawned.Contains(enemy))
+        {
+            enemiesSpawned.Remove(enemy);
+
+            if (enemiesSpawned.Count == 0)
+            {
+                OnCanTimeSkip?.Invoke(true);
+            }
+        }
+    }
+
     private void OnDestroy()
     {
         GlyphsUI.Instance.OnCometButtonClicked -= StartSpawning;
         GlyphsUI.Instance.OnFortressButtonClicked -= StartSpawning;
         GlyphsUI.Instance.OnLanceButtonClicked -= StartSpawning;
         GlyphsUI.Instance.OnMountainButtonClicked -= StartSpawning;
+        EnemyHealth.OnEnemyDied -= OnEnemyDeath;
+        EnemyUpdateUI.Instance.OnTimeSkipped -= OnTimeSkipped;
     }
 
     private void StartSpawning()
@@ -68,6 +95,9 @@ public class EnemyManager : MonoBehaviour
                 Enemy enemy = Instantiate(random == 0 ? aggressiveEnemyPrefab : random == 1 ? defensiveEnemyPrefab : hybridEnemyPrefab, new Vector3(randomX, transform.position.y, randomZ), Quaternion.identity);
 
                 OnEnemySpawned?.Invoke(enemy, value);
+                enemiesSpawned.Add(enemy);
+
+                OnCanTimeSkip?.Invoke(false);
             }
         }
         value += updatePerSecond * Time.deltaTime;
