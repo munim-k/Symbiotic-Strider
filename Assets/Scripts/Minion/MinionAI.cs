@@ -144,8 +144,8 @@ public class MinionAI : MonoBehaviour
                 cEnemy = enemy;
             }
         }
-        closestEnemy = cEnemy;
-
+        if(!(cEnemy == null && closestEnemy != null))
+            closestEnemy = cEnemy;
     }
 
     private void SetState(MinionState state)

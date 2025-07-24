@@ -354,7 +354,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   behaviourType: 2
-  movementSpeed: 5
+  movementSpeed: 8
   playerRange: 6
   meleeAttackRange: 2
   attackDelay: 6
