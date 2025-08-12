@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -20,7 +21,10 @@ public class PlayerMinionGrab : MonoBehaviour {
     private Vector3 grabTargetPosition;
     private Vector3 startGrabPosition;
 
-    private enum State {
+    public Action<bool> OnMinionGrabbed;
+
+    private enum State
+    {
         Idle,
         Moving,
         Grabbing,
@@ -123,16 +127,19 @@ public class PlayerMinionGrab : MonoBehaviour {
         }
     }
 
-    private void StartGrabbing() {
+    private void StartGrabbing()
+    {
         state = State.Grabbing;
         grablerp = 0f;
 
         grabTargetPosition = currentMinion.transform.position;
 
         float closestDistance = float.MaxValue;
-        for (int i = 0; i < IKTargets.Length; i++) {
+        for (int i = 0; i < IKTargets.Length; i++)
+        {
             float dist = Vector3.Distance(grabTargetPosition, IKTargets[i].position);
-            if (dist < closestDistance) {
+            if (dist < closestDistance)
+            {
                 closestDistance = dist;
                 currentIKTarget = i;
             }
@@ -141,6 +148,7 @@ public class PlayerMinionGrab : MonoBehaviour {
         startGrabPosition = IKTargets[currentIKTarget].position;
 
         currentMinion.Grab(); // Notify minion it's being grabbed
+        OnMinionGrabbed?.Invoke(true);
     }
 
     private void PerformGrabbing() {
@@ -165,7 +173,8 @@ public class PlayerMinionGrab : MonoBehaviour {
     }
 
     private void ThrowMinion(Vector3 point) {
-        if (currentMinion != null) {
+        if (currentMinion != null)
+        {
             Vector3 gravity = Physics.gravity;
             Vector3 startPos = currentMinion.transform.position;
             Vector3 displacement = point - startPos;
@@ -176,6 +185,7 @@ public class PlayerMinionGrab : MonoBehaviour {
 
             currentMinion = null;
             state = State.Throwing;
+            OnMinionGrabbed?.Invoke(false);
         }
     }
 }

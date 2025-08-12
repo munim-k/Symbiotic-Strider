@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.EventSystems;
@@ -7,14 +8,15 @@ public class PlayerMovement : MonoBehaviour {
     public static PlayerMovement Instance { get; private set; }
     public NavMeshAgent agent;
     [SerializeField] private GameObject touchIndicatorObject;
-
     private float originalMaxSpeed = 5f;
     private float originalMinSpeed = 1f;
 
     private float maxSpeed = 5f; // Maximum speed of the player
     private float minSpeed = 1f; // Minimum speed of the player when stamina is low
     private bool moving = false;
+    private bool hasGrabbed = false;
     public Action<bool> OnMove;
+    public Action<bool> OnGrabbed;
 
     private void Awake()
     {
@@ -38,8 +40,22 @@ public class PlayerMovement : MonoBehaviour {
         PlayerStats.Instance.OnStunProcced += HandleStunProcced;
         PlayerStats.Instance.OnPlayerUpgraded += HandlePlayerUpgrade;
 
+        PlayerMinionGrab.Instance.OnMinionGrabbed += OnMinionGrabbed;
+
         UpgradeUI.Instance.OnMoveSpeedUpgraded += MoveSpeedUpgraded;
         GlyphsUI.Instance.OnCometButtonClicked += MoveSpeedUpgradedBetter;
+    }
+
+    private void OnMinionGrabbed(bool grabbed)
+    {
+        OnGrabbed?.Invoke(grabbed);
+        StartCoroutine(HasGrabbedFrameDelay(grabbed));
+    }
+
+    private IEnumerator HasGrabbedFrameDelay(bool grabbed)
+    {
+        yield return null;
+        hasGrabbed = grabbed;
     }
 
     private void MoveSpeedUpgradedBetter()
@@ -61,7 +77,7 @@ public class PlayerMovement : MonoBehaviour {
         PlayerStats.Instance.OnPlayerUpgraded -= HandlePlayerUpgrade;
 
         UpgradeUI.Instance.OnMoveSpeedUpgraded -= MoveSpeedUpgraded;
-        GlyphsUI.Instance.OnCometButtonClicked += MoveSpeedUpgradedBetter;
+        GlyphsUI.Instance.OnCometButtonClicked -= MoveSpeedUpgradedBetter;
     }
 
     private void HandlePlayerUpgrade(float scale)
@@ -149,8 +165,17 @@ public class PlayerMovement : MonoBehaviour {
 #if UNITY_EDITOR || UNITY_STANDALONE
         if (Input.GetMouseButtonDown(0) && PlayerStats.Instance.GetCurrentStamina() > 0f && !EventSystem.current.IsPointerOverGameObject()) {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit)) {
+            if (Physics.Raycast(ray, out RaycastHit hit) && !hasGrabbed)
+            {
                 agent.SetDestination(hit.point);
+
+                Vector3 direction = hit.point - transform.position;
+                direction.y = 0f; // ignore vertical difference
+                if (direction != Vector3.zero)
+                {
+                    Quaternion targetRotation = Quaternion.LookRotation(direction);
+                    transform.rotation = targetRotation;
+                }
             }
         }
 #elif UNITY_ANDROID || UNITY_IOS
