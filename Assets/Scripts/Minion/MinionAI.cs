@@ -1,13 +1,12 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.AI;
 using System;
 using System.Linq;
 using System.Collections;
+
 public class MinionAI : MonoBehaviour
 {
-    [SerializeField] private Minion minion; //get minion component from the Minion script
-
+    [SerializeField] private Minion minion;
     [Header("Minion Movement Variables")]
     [SerializeField] private float detectionRadius = 3f;
     [SerializeField] private float speed = 3.5f;
@@ -16,23 +15,38 @@ public class MinionAI : MonoBehaviour
     [SerializeField] private MinionAnimation minionAnimation;
     public float damage = 10f;
     [SerializeField] private float waitTimeBetweenAttacks = 1f;
+    private BoxCollider boxCollider;
     private Enemy closestEnemy;
     private float attackRange = 1.0f;
     private bool isGrabbed = false;
     private bool isAttacking = false;
+    private bool isInAir = false;
+
+    // Player following variables
+    [Header("Following Player")]
+    [SerializeField] private float followDistance = 2f;
+    [SerializeField] private float followBuffer = 0.5f; // Stop before reaching exact follow distance
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private float groundCheckDistance = 0.2f;
+    private bool isGrounded = true;
+    private Transform player; 
+
     public enum MinionState
     {
         Idle,
         Moving,
-        Attacking
+        Attacking,
     }
 
     public Action<MinionState> OnStateChange;
     private MinionState currentState = MinionState.Idle;
-    private MinionState newState = MinionState.Idle;
 
     public static Action<Enemy, float> OnEnemyAttacked;
 
+    private void Awake()
+    {
+        boxCollider = GetComponent<BoxCollider>();
+    }
 
     private void Start()
     {
@@ -40,23 +54,18 @@ public class MinionAI : MonoBehaviour
         detectionRadius *= scale;
         speed *= scale;
         rotationSpeed *= scale;
+        attackRange *= scale;
+
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+            player = playerObj.transform;
+        else
+            Debug.LogWarning("Player with tag 'Player' not found!");
 
         minion.OnThisMinionGrabbed += HandleMinionGrabbedOrAttacked;
         minion.OnThisMinionThrown += HandleMinionThrown;
 
         minionAnimation.OnAttackAnimationComplete += HandleAttackAnimationComplete;
-        EnemyHealth.OnEnemyDied += EnemyHealth_OnEnemyDeath;
-    }
-
-    private void EnemyHealth_OnEnemyDeath(Enemy enemy)
-    {
-        closestEnemy = null;
-        StartCoroutine(DelayToAggro());
-    }
-
-    private IEnumerator DelayToAggro()
-    {
-        yield return new WaitForSeconds(1f);
     }
 
     private void HandleAttackAnimationComplete()
@@ -76,85 +85,146 @@ public class MinionAI : MonoBehaviour
     {
         minion.OnThisMinionGrabbed -= HandleMinionGrabbedOrAttacked;
         minion.OnThisMinionThrown -= HandleMinionThrown;
-
         minionAnimation.OnAttackAnimationComplete -= HandleAttackAnimationComplete;
-        EnemyHealth.OnEnemyDied -= EnemyHealth_OnEnemyDeath;
     }
 
     private void HandleMinionThrown()
     {
         isGrabbed = false;
+        isInAir = true;
+        StartCoroutine(CheckLanding());
+    }
+
+    private IEnumerator CheckLanding()
+    {
+        while (isInAir)
+        {
+            Vector3 rayOrigin = transform.position + Vector3.up * 0.1f;
+            isGrounded = Physics.Raycast(rayOrigin, Vector3.down, groundCheckDistance, groundLayer);
+            
+            if (isGrounded)
+            {
+                isInAir = false;
+                yield break;
+            }
+            yield return new WaitForFixedUpdate();
+        }
     }
 
     private void HandleMinionGrabbedOrAttacked()
     {
         isGrabbed = true;
-        SetState(MinionState.Idle);
+        currentState = MinionState.Idle;
+        OnStateChange?.Invoke(currentState);
         closestEnemy = null;
     }
 
     private void FixedUpdate()
     {
-        if (isGrabbed)
+        if (isGrabbed || isInAir)
             return;
-        HandleCollisionsWithEnemies();
 
+        CheckGrounded();
+        if (!isGrounded)
+        {
+            currentState = MinionState.Idle;
+            OnStateChange?.Invoke(currentState);
+            return;
+        }
+
+        UpdateClosestEnemy();
         HandleMinionMovement();
+    }
+
+    private void CheckGrounded()
+    {
+        Vector3 rayOrigin = transform.position + Vector3.up * 0.1f;
+        isGrounded = Physics.Raycast(rayOrigin, Vector3.down, groundCheckDistance, groundLayer);
+        Debug.DrawRay(rayOrigin, Vector3.down * groundCheckDistance, isGrounded ? Color.green : Color.red);
     }
 
     private void HandleMinionMovement()
     {
-        if (closestEnemy == null)
+        // Priority 1: Fight enemy
+        if (closestEnemy != null)
         {
-            SetState(MinionState.Idle);
+            float distanceToEnemy = Vector3.Distance(closestEnemy.transform.position, transform.position);
+            
+            if (distanceToEnemy <= attackRange)
+            {
+                if (!isAttacking)
+                {
+                    currentState = MinionState.Attacking;
+                    OnStateChange?.Invoke(currentState);
+                    isAttacking = true;
+                }
+            }
+            else
+            {
+                if (isAttacking) return;
+
+                currentState = MinionState.Moving;
+                OnStateChange?.Invoke(currentState);
+                MoveTowards(closestEnemy.transform.position);
+            }
             return;
         }
 
-        // Check if the closest enemy is within attack range
-        if (Vector3.Distance(closestEnemy.transform.position, transform.position) <= attackRange && !isAttacking)
+        // Priority 2: Follow player if too far
+        if (player != null)
         {
-            SetState(MinionState.Attacking);
-            isAttacking = true;
-        }
-        else
-        {
-            if (isAttacking)
+            float distToPlayer = Vector3.Distance(player.position, transform.position);
+            if (distToPlayer > followDistance + followBuffer)
+            {
+                currentState = MinionState.Moving;
+                OnStateChange?.Invoke(currentState);
+                MoveTowards(player.position);
                 return;
-            SetState(MinionState.Moving);
-            //start moving towards the enemy while rotating towards it
-            transform.position = Vector3.MoveTowards(transform.position, closestEnemy.transform.position, speed * Time.fixedDeltaTime);
-            Vector3 direction = (closestEnemy.transform.position - transform.position).normalized;
-            direction.y = 0f;
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            }
+        }
 
+        // Priority 3: Idle
+        if (currentState != MinionState.Idle)
+        {
+            currentState = MinionState.Idle;
+            OnStateChange?.Invoke(currentState);
+        }
+    }
+
+    private void MoveTowards(Vector3 target)
+    {
+        // Only move on the XZ plane
+        Vector3 targetPosition = new Vector3(target.x, transform.position.y, target.z);
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.fixedDeltaTime);
+        
+        Vector3 direction = (targetPosition - transform.position).normalized;
+        if (direction != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
         }
     }
 
-    private void HandleCollisionsWithEnemies()
+    private void UpdateClosestEnemy()
     {
         Collider[] hits = Physics.OverlapSphere(transform.position, detectionRadius, enemyLayer);
 
-        Enemy cEnemy = null;
-        float cDistance = float.MaxValue;
+        Enemy newClosestEnemy = null;
+        float closestDistance = float.MaxValue;
+        
         foreach (Collider hit in hits)
         {
-            if (hit.TryGetComponent(out Enemy enemy) && enemy.gameObject.activeInHierarchy && cDistance > Vector3.Distance(enemy.transform.position, transform.position))
+            if (hit.TryGetComponent(out Enemy enemy) && enemy.gameObject.activeInHierarchy)
             {
-                cEnemy = enemy;
+                float dist = Vector3.Distance(enemy.transform.position, transform.position);
+                if (dist < closestDistance)
+                {
+                    newClosestEnemy = enemy;
+                    closestDistance = dist;
+                }
             }
         }
-        if(!(cEnemy == null && closestEnemy != null))
-            closestEnemy = cEnemy;
-    }
-
-    private void SetState(MinionState state)
-    {
-        newState = state;
-        if (currentState != newState)
-        {
-            currentState = newState;
-            OnStateChange?.Invoke(currentState);
-        }
+        
+        closestEnemy = newClosestEnemy;
     }
 }

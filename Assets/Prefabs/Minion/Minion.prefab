@@ -142,7 +142,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minion: {fileID: 4002817101319071614}
   detectionRadius: 3
-  speed: 3.5
+  speed: 4
   rotationSpeed: 5
   enemyLayer:
     serializedVersion: 2
@@ -150,6 +150,10 @@ MonoBehaviour:
   minionAnimation: {fileID: 1898797936490500251}
   damage: 7
   waitTimeBetweenAttacks: 0.5
+  followDistance: 1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1001 &5176522550006696153
 PrefabInstance:
   m_ObjectHideFlags: 0
